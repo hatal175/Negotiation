@@ -186,6 +186,7 @@
     <Compile Include="Models\NegotiationStatus.cs" />
     <Compile Include="Models\NegotiationTopic.cs" />
     <Compile Include="Models\NegotiationTopicOffer.cs" />
+    <Compile Include="Models\PreNegotiationQuestionnaireViewModel.cs" />
     <Compile Include="Models\ScoredNegotiationOption.cs" />
     <Compile Include="Models\ScoringVariant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

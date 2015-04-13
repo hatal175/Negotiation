@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Negotiation.Models.PreNegotiationQuestionnaireViewModel
+@{
     Layout = null;
     ViewBag.Title = "PreNegotiation Questionnaire";
 }
@@ -7,18 +8,97 @@
 
 <html>
 <head>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
     <meta name="viewport" content="width=device-width" />
     <title></title>
 </head>
-<body style ="text-align:center">
-    <div>
-        <h2>Pre-Negotiation Questionnaire</h2>
-    </div>
-    <div>
+<body>
+    <div style="text-align:center">
+        <h2>Pre-Negotiation Questionnaire</h2> <br />
         The experiment will begin with a questionnaire. Please answer the questions on this page. Press Continue when finished.
     </div>
-    <div>
-
+@using (Html.BeginForm("SubmitUserData", "Negotiation", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{ 
+    <table class="grid" align="center">
+        <tr>
+            <td class="tablecelltitle">Gender:</td>
+            <td class="tablecellcontent">
+                @Html.DropDownListFor(m => m.Gender,
+            Enum.GetNames(typeof(Negotiation.Models.Gender)).Select(x => new SelectListItem { Value = x, Text = x }), "--select--")
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">Age Range:</td>
+            <td class="tablecellcontent">
+                @Html.DropDownListFor(m => m.AgeRange,
+            Enum.GetNames(typeof(Negotiation.Models.AgeRange)).Select(x => new SelectListItem
+            {
+                Value = x,
+                Text = ((System.ComponentModel.DescriptionAttribute)Attribute.GetCustomAttributes(typeof(Negotiation.Models.AgeRange).GetField(x),
+                        typeof(System.ComponentModel.DescriptionAttribute))[0]).Description
+            }), "--select--")
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">Education:</td>
+            <td class="tablecellcontent">
+                @Html.DropDownListFor(m => m.Education,
+                     Enum.GetNames(typeof(Negotiation.Models.Education)).Select(x => new SelectListItem
+            {
+                Value = x,
+                Text = ((System.ComponentModel.DescriptionAttribute)Attribute.GetCustomAttributes(typeof(Negotiation.Models.Education).GetField(x),
+                        typeof(System.ComponentModel.DescriptionAttribute))[0]).Description
+            }), "--select--")
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">In case you have a university degree, in which field?</td>
+            <td class="tablecellcontent">
+                @Html.TextBoxFor(m => m.DegreeField)
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">Country of birth:</td>
+            <td class="tablecellcontent">
+                @Html.TextBoxFor(m => m.BirthCountry)
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">Name:</td>
+            <td class="tablecellcontent">
+                @Html.TextBoxFor(m => m.Name)
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">ID:</td>
+            <td class="tablecellcontent">
+                @Html.TextBoxFor(m => m.ID)
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">University:</td>
+            <td class="tablecellcontent">
+                @Html.TextBoxFor(m => m.University)
+            </td>
+        </tr>
+        <tr>
+            <td class="tablecelltitle">I consent to the IRB (Institutional Review Board) form:</td>
+            <td class="tablecellcontent">
+               @Html.CheckBoxFor(m => m.AgreeIRB) 
+            </td>
+        </tr>
+    </table>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-default" value="Submit" />
+        </div>
     </div>
+    <div>
+       @Html.ValidationSummary()
+    </div>
+}
+    
+   
+
 </body>
 </html>

@@ -22,3 +22,11 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.tablecelltitle {
+    text-align : right;
+}
+
+.tablecellcontent {
+    text-align : left;
+}
