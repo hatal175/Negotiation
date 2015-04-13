@@ -1,0 +1,30 @@
+﻿@model Negotiation.Models.NegotiationTutorialModel
+@{
+    Layout = null;
+    ViewBag.Title = "NegotiationTutorial";
+}
+
+<h2 style="text-align:center">Negotiation Tutorial</h2>
+
+<div>
+    Please read the tutorial presentation (opens in a new window), then answer the questions below:<br />
+</div>
+
+@using (Html.BeginForm("SubmitTutorialAnswers", "Negotiation", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    for (int i = 0; i < Model.Questions.Count; i++)
+    {
+        <h4>Question @i</h4>
+        @Model.Questions[i].Question
+        @Html.DropDownListFor(m => m.Questions[i].Answer, Model.Questions[i].Options.Select(x=>new SelectListItem{Text=x,Value=x}), "--select--")
+    }
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-default" value="Continue" />
+        </div>
+    </div>
+}
+
+Whose side are you playing in the negotiation?<br />
+

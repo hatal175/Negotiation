@@ -168,6 +168,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AgentNegotiator.cs" />
     <Compile Include="Models\BaseNegotiator.cs" />
+    <Compile Include="Models\NegotiationTutorialModel.cs" />
     <Compile Include="Models\IAgentStrategy.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\INegotiationChannel.cs" />
@@ -249,6 +250,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Negotiation\PreNegotiationQuestionnaire.cshtml" />
+    <Content Include="Views\Negotiation\NegotiationTutorial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
