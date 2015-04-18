@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Collections.Concurrent;
 
 namespace Negotiation.Models
 {
@@ -13,13 +14,20 @@ namespace Negotiation.Models
         public String Variant { get; set; }
     }
 
-    public class NegotiationDomainManager
+    public class NegotiationManager
     {
-        public static int TotalRounds;
+        public static ConcurrentDictionary<String, NegotiationEngine> OnGoingNegotiations { get; private set; }
+        public static ConcurrentDictionary<String, NegotiationTutorialModel> TutorialModels { get; private set; }
 
-        static NegotiationDomainManager()
+        public static int TotalRounds;
+        public static TimeSpan RoundLength;
+
+        static NegotiationManager()
         {
             TotalRounds = 15;
+            RoundLength = new TimeSpan(0, 2, 0);
+            OnGoingNegotiations = new ConcurrentDictionary<string, NegotiationEngine>();
+            TutorialModels = new ConcurrentDictionary<string, NegotiationTutorialModel>();
             LoadDbData();
         }
 
@@ -32,7 +40,7 @@ namespace Negotiation.Models
 
             GameDomain = cont.GameDomainConfigSet.First().GameDomain;
 
-            Domain = new NegotiationDomain();
+            Domain = new NegotiationDomain() {RoundLength = RoundLength, NumberOfRounds = TotalRounds };
             XmlDocument doc = new XmlDocument();
             
             doc.LoadXml(GameDomain.DomainXML);

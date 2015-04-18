@@ -1,18 +1,19 @@
 ﻿@model Negotiation.Models.NegotiationViewModel
 @{
     ViewBag.Title = "Negotiation";
+    Layout = null;
 }
 
 <div style="width:100%; display:table">
     <div style="display:table-row">
-        <div id="yourScoreTable" style="display:table-cell; width:300px; visibility:collapse">
+        <div id="yourScoreTable" style="display:table-cell; width:300px; visibility:collapse; border-style:dashed; border-color:gray">
             @Html.Partial("NegotiationSideView", new List<Negotiation.Models.NegotiationSideDescription>() { Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant] })
         </div>
-        <div id="partnerScoreTable" style="display:table-cell; width:400px; visibility:collapse">
+        <div id="partnerScoreTable" style="display:table-cell; width:400px; visibility:collapse; border-style:dashed; border-color:gray">
             @Html.Partial("NegotiationSideView", Model.Domain.OwnerVariantDict[Model.AiSide].Values)
         </div>
         <div style="display:table-cell">
-            <div>
+            <div style="border-style:solid; border-color:purple">
                 <table>
                     <tr>
                         <td>
@@ -34,7 +35,7 @@
                     </tr>
                 </table>
             </div>
-            <div>
+            <div style="border-style:solid; border-color:blue">
                 Use the menuts below to select your offer <br />
                 <ul>
                     <li>
@@ -69,10 +70,10 @@
                     {
                         <tr>
                             <td>
-                                @topic.Name + ":"
+                                @topic.Key + ":"
                             </td>
                             <td>
-                                @Html.DropDownListFor(m => m.Offer.Offers[topic.Name], topic.Options.Select(x => x.Name))
+                                @Html.DropDownListFor(m => m.Offer.Offers[topic.Key], topic.Value.Options.Values.Select(x => new SelectListItem { Text = x.Name, Value = x.Name }))
                             </td>
                         </tr>
                     }
@@ -88,7 +89,7 @@
                 <button>Send Offer</button> or reply to recent partner's offer: <button>Accept</button>  <button>Reject</button><br />
                 <button>Sign the agreement</button>
             </div>
-            <div>
+            <div style="border-style:solid; border-color:turquoise">
                 <h2>History of actions</h2>
                 <table>
                     <tr>
@@ -106,10 +107,10 @@
                     {
                         <tr>
                             <td>
-                                @action.NegotiationSide
+                                @action.Role
                             </td>
                             <td>
-                                @action.ActionType
+                                @action.Type
                             </td>
                             <td>
                                 @action.Value
@@ -118,7 +119,7 @@
                     }
                 </table>
             </div>
-            <div>
+            <div style="border-style:solid; border-color:black">
                 <b>Click here to quit the negotiation immediately: <button>Opt Out</button></b>
             </div>
         </div>

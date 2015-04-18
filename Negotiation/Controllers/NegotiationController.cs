@@ -11,12 +11,9 @@ namespace Negotiation.Controllers
 {
     public class NegotiationController : Controller
     {
-        private Dictionary<String, NegotiationEngine> _onGoingNegotiations;
+        
 
-        public NegotiationController()
-        {
-            _onGoingNegotiations = new Dictionary<string, NegotiationEngine>();
-        }
+        
 
         // GET: Negotiation
         public ActionResult Index()
@@ -31,20 +28,21 @@ namespace Negotiation.Controllers
 
         public ActionResult SubmitUserData(PreNegotiationQuestionnaireViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("PreNegotiationQuestionnaire", model);
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return View("PreNegotiationQuestionnaire", model);
+            //}
 
-            if (!model.AgreeIRB)
-            {
-                ModelState.AddModelError("AgreeIRB", "Please agree to the IRB form");
-                return View("PreNegotiationQuestionnaire", model);
-            }
+            //if (!model.AgreeIRB)
+            //{
+            //    ModelState.AddModelError("AgreeIRB", "Please agree to the IRB form");
+            //    return View("PreNegotiationQuestionnaire", model);
+            //}
 
             String id = CreateNewNegotiation();
 
             NegotiationTutorialModel tutModel = CreateTutorialModel(id);
+            NegotiationManager.TutorialModels.TryAdd(id, tutModel);
 
             return NegotiationTutorial(tutModel);
         }
@@ -52,9 +50,9 @@ namespace Negotiation.Controllers
         private string CreateNewNegotiation()
         {
             string id = this.Request.UserHostAddress + ";" + DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture);
-            NegotiationEngine engine = new NegotiationEngine(NegotiationDomainManager.Domain, null, NegotiationDomainManager.GetHumanConfig(), NegotiationDomainManager.GetAiConfig());
+            NegotiationEngine engine = new NegotiationEngine(NegotiationManager.Domain, null, NegotiationManager.GetHumanConfig(), NegotiationManager.GetAiConfig());
 
-            _onGoingNegotiations.Add(id, engine);
+            NegotiationManager.OnGoingNegotiations.TryAdd(id, engine);
 
             return id;
         }
@@ -66,17 +64,17 @@ namespace Negotiation.Controllers
 
         private NegotiationTutorialModel CreateTutorialModel(string id)
         {
-            NegotiationEngine engine = _onGoingNegotiations[id];
+            NegotiationEngine engine = NegotiationManager.OnGoingNegotiations[id];
 
             SideConfig config = engine.HumanConfig; 
 
             NegotiationSideDescription desc = engine.Domain.OwnerVariantDict[config.Side][config.Variant];
 
-            int optoutend = (desc.Optout + desc.TimeEffect * NegotiationDomainManager.TotalRounds);
+            int optoutend = (desc.Optout + desc.TimeEffect * NegotiationManager.TotalRounds);
 
             return new NegotiationTutorialModel
             {
-                Id = id,
+                TutorialId = id,
                 Questions = new List<QuestionModel>
                 {
                     new QuestionModel 
@@ -125,19 +123,24 @@ namespace Negotiation.Controllers
 
         public ActionResult SubmitTutorialAnswers(NegotiationTutorialModel model)
         {
-            if (!model.Questions.Select(x=>x.Answer).SequenceEqual(model.Questions.Select(x=>x.ActualAnswer)))
-                return View("NegotiationTutorial", model);
+            //if (!model.Questions.Select(x => x.Answer).SequenceEqual(NegotiationManager.TutorialModels[model.TutorialId].Questions.Select(x => x.ActualAnswer)))
+            //{
+            //    return View("NegotiationTutorial", NegotiationManager.TutorialModels[model.TutorialId]);
+            //}
 
-            NegotiationEngine engine = _onGoingNegotiations[model.Id];
+            NegotiationTutorialModel temp;
+            NegotiationManager.TutorialModels.TryRemove(model.TutorialId, out temp);
+
+            NegotiationEngine engine = NegotiationManager.OnGoingNegotiations[model.TutorialId];
 
             NegotiationViewModel newModel = new NegotiationViewModel
             {
-                Id = model.Id,
+                Id = model.TutorialId,
                 AiSide = engine.AiConfig.Side,
                 HumanConfig = engine.HumanConfig,
                 RemainingTime = TimeSpan.FromSeconds(engine.Domain.NumberOfRounds * engine.Domain.RoundLength.TotalSeconds),
                 Domain = engine.Domain,
-                Actions = new List<NegotiationAction>()
+                Actions = new List<NegotiationActionModel>()
 
             };
 
@@ -156,7 +159,7 @@ namespace Negotiation.Controllers
 
         public ActionResult NewActiveDomain(NegotiationConfigurationModel model)
         {
-            if (NegotiationDomainManager.GameDomain.Name != model.ActiveDomain)
+            if (NegotiationManager.GameDomain.Name != model.ActiveDomain)
             {
 
             }

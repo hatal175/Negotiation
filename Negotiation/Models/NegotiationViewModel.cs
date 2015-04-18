@@ -8,6 +8,12 @@ namespace Negotiation.Models
 {
     public class NegotiationViewModel
     {
+        public NegotiationViewModel()
+        {
+            Actions = new List<NegotiationActionModel>();
+            Offer = new NegotiationOffer();
+        }
+
         public String Id { get; set; }
 
         public SideConfig HumanConfig { get; set; }
@@ -18,6 +24,6 @@ namespace Negotiation.Models
 
         public TimeSpan RemainingTime { get; set; }
 
-        public List<NegotiationAction> Actions { get; set; }
+        public List<NegotiationActionModel> Actions { get; set; }
     }
 }

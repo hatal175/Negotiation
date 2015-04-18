@@ -41,7 +41,7 @@ namespace Negotiation.Models
             NegotiationSideDescription desc = new NegotiationSideDescription();
 
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(NegotiationDomainManager.GameDomain.DomainVariant.First(x => x.Name == node.Attributes["utility_space"].Value).VariantXML);
+            doc.LoadXml(NegotiationManager.GameDomain.DomainVariant.First(x => x.Name == node.Attributes["utility_space"].Value).VariantXML);
             desc.Extract(doc);
 
             return desc;

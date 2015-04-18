@@ -22,7 +22,7 @@
                     <b>@topic</b>
                 </td>
             </tr>
-            foreach (var optionName in Model.Select(x=>x.Topics[topic].Options.Keys))
+            foreach (String optionName in Model.First().Topics[topic].Options.Keys)
             {
                 <tr>
                     <td>@optionName</td>

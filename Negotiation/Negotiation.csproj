@@ -205,8 +205,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Negotiation.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\NegotiationActionModel.cs" />
     <Compile Include="Models\NegotiationConfigurationModel.cs" />
-    <Compile Include="Models\NegotiationDomainManager.cs" />
+    <Compile Include="Models\NegotiationManager.cs" />
     <Compile Include="Models\NegotiationTutorialModel.cs" />
     <Compile Include="Models\IAgentStrategy.cs" />
     <Compile Include="Models\IdentityModels.cs" />

@@ -20,7 +20,7 @@ namespace Negotiation.Models
 
     public class NegotiationTutorialModel
     {
-        public String Id { get; set; }
+        public String TutorialId { get; set; }
         public List<QuestionModel> Questions { get; set; }
     }
 }
