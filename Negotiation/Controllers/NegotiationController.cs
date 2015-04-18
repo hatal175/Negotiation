@@ -4,11 +4,20 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Negotiation.Models;
+using System.Globalization;
+using Negotiation.App_Start;
 
 namespace Negotiation.Controllers
 {
     public class NegotiationController : Controller
     {
+        private Dictionary<String, NegotiationEngine> _onGoingNegotiations;
+
+        public NegotiationController()
+        {
+            _onGoingNegotiations = new Dictionary<string, NegotiationEngine>();
+        }
+
         // GET: Negotiation
         public ActionResult Index()
         {
@@ -33,9 +42,21 @@ namespace Negotiation.Controllers
                 return View("PreNegotiationQuestionnaire", model);
             }
 
-             NegotiationTutorialModel tutModel = CreateTutorialModel();
+            String id = CreateNewNegotiation();
 
-             return NegotiationTutorial(tutModel);
+            NegotiationTutorialModel tutModel = CreateTutorialModel(id);
+
+            return NegotiationTutorial(tutModel);
+        }
+
+        private string CreateNewNegotiation()
+        {
+            string id = this.Request.UserHostAddress + ";" + DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture);
+            NegotiationEngine engine = new NegotiationEngine(null, null, NegotiationConfig.GetHumanConfig(), NegotiationConfig.GetAiConfig());
+
+            _onGoingNegotiations.Add(id, engine);
+
+            return id;
         }
 
         public ActionResult NegotiationTutorial(NegotiationTutorialModel model)
@@ -43,25 +64,47 @@ namespace Negotiation.Controllers
             return View(model);
         }
 
-        private NegotiationTutorialModel CreateTutorialModel()
+        private NegotiationTutorialModel CreateTutorialModel(string id)
         {
+            NegotiationEngine engine = _onGoingNegotiations[id];
+
+            SideConfig config = engine.HumanConfig; 
+
+            NegotiationSideDescription desc = engine.Domain.OwnerVariantDict[config.Side][config.Variant];
+
             return new NegotiationTutorialModel
             {
                 Questions = new List<QuestionModel>
                 {
                     new QuestionModel 
                     {
-                        Question = "Whose side are you playing in the negotiation?"
+                        Question = "Whose side are you playing in the negotiation?",
+                        Options = engine.Domain.OwnerVariantDict.Keys.ToList(),
+                        ActualAnswer = config.Side
                         
                     },
                     new QuestionModel 
                     {
-                        Question = "If the same agreement was reached in round 3 or in round 6, which of the following is correct?"
+                        Question = "If the same agreement was reached in round 3 or in round 6, which of the following is correct?",
+                        Options = 
+                        {
+                            "They have the same score.",
+                            "Round 3 will have a higher score.",
+                            "Round 6 will have a higher score"
+                        },
+                        ActualAnswer = "Round 3 will have a higher score."
                         
                     },
                     new QuestionModel 
                     {
-                        Question = "What is your score if no agreement had been reached by the end of the last round?"
+                        Question = "What is your score if no agreement had been reached by the end of the last round?",
+                        Options = 
+                        {
+                            "0",
+                            "No score - you have lost the negotiation",
+                            (desc.Optout + desc.TimeEffect * NegotiationConfig.TotalRounds).ToString()
+                        },
+                        ActualAnswer = (desc.Optout + desc.TimeEffect * NegotiationConfig.TotalRounds).ToString()
                         
                     },
                     new QuestionModel 
@@ -83,7 +126,12 @@ namespace Negotiation.Controllers
             if (!model.Questions.Select(x=>x.Answer).SequenceEqual(model.Questions.Select(x=>x.ActualAnswer)))
                 return View("NegotiationTutorial");
 
-            return View();
+            return View("Negotiation");
+        }
+
+        public ActionResult Negotiation(NegotiationViewModel model)
+        {
+            return View(model);
         }
     }
 }

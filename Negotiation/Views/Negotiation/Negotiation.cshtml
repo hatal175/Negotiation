@@ -1,0 +1,113 @@
+﻿@model Negotiation.Models.NegotiationViewModel
+@{
+    ViewBag.Title = "Negotiation";
+}
+
+<div>
+    <table>
+        <tr>
+            <td>
+                Your role: @Model.HumanConfig.Side
+            </td>
+            <td>
+                Remaining Time:
+            </td>
+            <td>
+                <button>
+                    Your scores
+                </button>
+            </td>
+            <td>
+                <button>
+                    Partner's scores
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div>
+    Use the menuts below to select your offer <br />
+    <ul>
+        <li>
+            You play the role of the <b>@Model.HumanConfig.Side</b>.
+        </li>
+        <li>
+            The negotiation relates to several <b>issues</b>. For each issue, there are several possible <b>values</b>.
+        </li>
+        <li>
+            Your score depends on the <b>values</b> in the final agreement, and on <b>time</b>. Click "Your scores" for details.
+        </li>
+        <li>
+            Use the menus below as a draft. Your partner cannot see them - you communicate with the buttons below ("send offer", "accept", and "reject").
+        </li>
+        <li>
+            To sign on an agreement, you MUST click the same values as your partner. <b>As you click on the same one, it turns green</b>. (Note that "Sign the agreement" is greyed out).
+        </li>
+        <li>
+            This draft is <b>not binding</b> until both of you sign it.
+        </li>
+    </ul>
+    <table>
+        <tr>
+            <td>
+                <b>Issue:</b>
+            </td>
+            <td>
+                <b>Options:</b>
+            </td>
+        </tr>
+        @foreach (var topic in Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].Topics)
+        {
+            <tr>
+                <td>
+                    @topic.Name + ":"
+                </td>
+                <td>
+                    @Html.DropDownListFor(m => m.Offer.Offers[topic.Name], topic.Options.Select(x=>x.Name))
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                Your score:
+            </td>
+            <td>
+                @(Model.Offer.Offers.Values.Sum(x => int.Parse(x.TopicValue)) + (((int)(Model.Domain.RoundLength.TotalSeconds * Model.Domain.NumberOfRounds - Model.RemainingTime.TotalSeconds)) / (int)Model.Domain.RoundLength.TotalSeconds) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
+            </td>
+        </tr>
+    </table>
+    <button>Send Offer</button> or reply to recent partner's offer: <button>Accept</button>  <button>Reject</button><br />
+    <button>Sign the agreement</button>
+</div>
+<div>
+    <h2>History of actions</h2>
+    <table>
+        <tr>
+            <th>
+                Proposer
+            </th>
+            <th>
+                Action
+            </th>
+            <th>
+                Value
+            </th>
+        </tr>
+        @foreach (var action in Model.Actions)
+        {
+            <tr>
+                <td>
+                    @action.NegotiationSide
+                </td>
+                <td>
+                    @action.ActionType
+                </td>
+                <td>
+                    @action.Value
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+

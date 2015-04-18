@@ -156,6 +156,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
+    <Compile Include="App_Start\NegotiationConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Models\NegotiationStatus.cs" />
     <Compile Include="Models\NegotiationTopic.cs" />
     <Compile Include="Models\NegotiationTopicOffer.cs" />
+    <Compile Include="Models\NegotiationViewModel.cs" />
     <Compile Include="Models\PreNegotiationQuestionnaireViewModel.cs" />
     <Compile Include="Models\ScoredNegotiationOption.cs" />
     <Compile Include="Models\ScoringVariant.cs" />
@@ -251,6 +253,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Negotiation\PreNegotiationQuestionnaire.cshtml" />
     <Content Include="Views\Negotiation\NegotiationTutorial.cshtml" />
+    <Content Include="Views\Negotiation\Negotiation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -7,6 +7,6 @@ namespace Negotiation.Models
 {
     public class NegotiationOffer
     {
-        public List<NegotiationTopicOffer> Offers { get; set; }
+        public Dictionary<String,NegotiationTopicOffer> Offers { get; set; }
     }
 }

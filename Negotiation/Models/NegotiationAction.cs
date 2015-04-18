@@ -9,8 +9,8 @@ namespace Negotiation.Models
     {
         public NegotiationActionType ActionType { get; set; }
         public String UserId { get; set; }
-        public int NegotiationSide { get; set; }
+        public String NegotiationSide { get; set; }
         TimeSpan RemainingTime { get; set; }
-        Object Value { get; set; }
+        String Value { get; set; }
     }
 }

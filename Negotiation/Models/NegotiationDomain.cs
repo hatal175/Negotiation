@@ -13,5 +13,9 @@ namespace Negotiation.Models
 
         public NegotiationDescription<NegotiationTopic<NegotiationOption>,
             NegotiationOption> Options { get; private set; }
+
+        public TimeSpan RoundLength { get; set; }
+        public int NumberOfRounds { get; set; }
+
     }
 }
