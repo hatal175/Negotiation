@@ -7,8 +7,18 @@ using System.Xml.Serialization;
 namespace Negotiation.Models
 {
     [Serializable]
-    public class NegotiationOption
+    public class NegotiationOption : IXmlExtractable
     {
+        public NegotiationOption()
+        {
+
+        }
+
         public string Name { get; set; }
+
+        public virtual void Extract(System.Xml.XmlNode node)
+        {
+            Name = node.Attributes["value"].Value;
+        }
     }
 }

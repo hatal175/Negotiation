@@ -11,6 +11,7 @@ namespace Negotiation.Models
         public String Id { get; set; }
 
         public SideConfig HumanConfig { get; set; }
+        public String AiSide { get; set; }
         public NegotiationDomain Domain { get; set; }
 
         public NegotiationOffer Offer { get; set; }

@@ -12,14 +12,17 @@ namespace Negotiation.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class NegotiationAction
+    public partial class GameDomain
     {
-        public int Id { get; set; }
-        public NegotiationActionType Type { get; set; }
-        public System.TimeSpan RemainingTime { get; set; }
-        public string Value { get; set; }
-        public int GameId { get; set; }
+        public GameDomain()
+        {
+            this.DomainVariant = new HashSet<DomainVariant>();
+        }
     
-        public virtual User User { get; set; }
+        public int Id { get; set; }
+        public string DomainXML { get; set; }
+        public string Name { get; set; }
+    
+        public virtual ICollection<DomainVariant> DomainVariant { get; set; }
     }
 }

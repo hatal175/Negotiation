@@ -12,14 +12,13 @@ namespace Negotiation.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class NegotiationAction
+    public partial class User
     {
         public int Id { get; set; }
-        public NegotiationActionType Type { get; set; }
-        public System.TimeSpan RemainingTime { get; set; }
-        public string Value { get; set; }
-        public int GameId { get; set; }
+        public string UserString { get; set; }
+        public UserType Type { get; set; }
     
-        public virtual User User { get; set; }
+        public virtual UserRole UserRole { get; set; }
+        public virtual Strategy Strategy { get; set; }
     }
 }

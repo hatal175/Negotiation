@@ -12,14 +12,20 @@ namespace Negotiation.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class NegotiationAction
+    public partial class Game
     {
-        public int Id { get; set; }
-        public NegotiationActionType Type { get; set; }
-        public System.TimeSpan RemainingTime { get; set; }
-        public string Value { get; set; }
-        public int GameId { get; set; }
+        public Game()
+        {
+            this.Users = new HashSet<User>();
+            this.NegotiationAction = new HashSet<NegotiationAction>();
+            this.UserResult = new HashSet<UserResult>();
+        }
     
-        public virtual User User { get; set; }
+        public int Id { get; set; }
+    
+        public virtual ICollection<User> Users { get; set; }
+        public virtual ICollection<NegotiationAction> NegotiationAction { get; set; }
+        public virtual GameDomain GameDomain { get; set; }
+        public virtual ICollection<UserResult> UserResult { get; set; }
     }
 }

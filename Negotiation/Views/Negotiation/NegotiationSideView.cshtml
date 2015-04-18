@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Negotiation.Models.NegotiationSideDescription>
+@{
+    <table>
+        <tr>
+            <th>Values</th>
+            @if (Model.Count() == 1)
+            {
+                <th>Scores</th>
+            }
+            else
+            {
+                foreach (var side in Model)
+                {
+                    <th>@side.Name</th>
+                }
+            }
+        </tr>
+        @foreach (var topic in Model.First().Topics.Keys)
+        {
+            <tr>
+                <td>
+                    <b>@topic</b>
+                </td>
+            </tr>
+            foreach (var optionName in Model.Select(x=>x.Topics[topic].Options.Keys))
+            {
+                <tr>
+                    <td>@optionName</td>
+                    @foreach (var option in Model.Select(x=>x.Topics[topic].Options[optionName]))
+                    {
+                        <td>@String.Format("+#;-#;0", option.Score)</td>
+                    }
+                </tr>
+            }
+        }
+        <tr>
+            <td>
+                Decrease per @Negotiation.App_Start.NegotiationConfig.RoundLength.TotalSeconds sec:
+            </td>
+            @foreach (var time in Model.Select(x=>x.TimeEffect))
+            { 
+                <td>
+                    @String.Format("+#;-#;0", time)
+                </td>
+            }
+        </tr>
+        <tr>
+            <td>
+                Opt-out score:
+            </td>
+            @foreach (var optout in Model.Select(x => x.Optout))
+            {
+                <td>
+                    @String.Format("+#;-#;0", optout)
+                </td>
+            }
+        </tr>
+        <tr>
+            <td>
+                Time-out score:
+            </td>
+            @foreach (var statusQuoScore in Model.Select(x => x.StatusQuoScore))
+            {
+                <td>
+                    @String.Format("+#;-#;0", statusQuoScore)
+                </td>
+            }
+        </tr>
+        
+    </table>
+}

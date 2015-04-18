@@ -1,0 +1,614 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Negotiation.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="NegotiationStoreContainer">
+    <EntitySet Name="NegotiationActionSet" EntityType="Negotiation.Store.NegotiationActionSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="UserSet" EntityType="Negotiation.Store.UserSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="UserRoleSet" EntityType="Negotiation.Store.UserRoleSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="GameSet" EntityType="Negotiation.Store.GameSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="GameDomainSet" EntityType="Negotiation.Store.GameDomainSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="UserResultSet" EntityType="Negotiation.Store.UserResultSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="StrategySet" EntityType="Negotiation.Store.StrategySet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="DomainVariantSet" EntityType="Negotiation.Store.DomainVariantSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="GameDomainConfigSet" EntityType="Negotiation.Store.GameDomainConfigSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="NegotiationActionUserId" Association="Negotiation.Store.NegotiationActionUserId">
+      <End Role="NegotiationAction" EntitySet="NegotiationActionSet" />
+      <End Role="UserId" EntitySet="UserSet" />
+    </AssociationSet>
+    <AssociationSet Name="UserUserRole" Association="Negotiation.Store.UserUserRole">
+      <End Role="User" EntitySet="UserSet" />
+      <End Role="UserRole" EntitySet="UserRoleSet" />
+    </AssociationSet>
+    <AssociationSet Name="GameUser" Association="Negotiation.Store.GameUser">
+      <End Role="Game" EntitySet="GameSet" />
+      <End Role="User" EntitySet="UserSet" />
+    </AssociationSet>
+    <AssociationSet Name="GameNegotiationAction" Association="Negotiation.Store.GameNegotiationAction">
+      <End Role="Game" EntitySet="GameSet" />
+      <End Role="NegotiationAction" EntitySet="NegotiationActionSet" />
+    </AssociationSet>
+    <AssociationSet Name="GameGameDomain" Association="Negotiation.Store.GameGameDomain">
+      <End Role="Game" EntitySet="GameSet" />
+      <End Role="GameDomain" EntitySet="GameDomainSet" />
+    </AssociationSet>
+    <AssociationSet Name="GameUserResult" Association="Negotiation.Store.GameUserResult">
+      <End Role="Game" EntitySet="GameSet" />
+      <End Role="UserResult" EntitySet="UserResultSet" />
+    </AssociationSet>
+    <AssociationSet Name="UserStrategy" Association="Negotiation.Store.UserStrategy">
+      <End Role="User" EntitySet="UserSet" />
+      <End Role="Strategy" EntitySet="StrategySet" />
+    </AssociationSet>
+    <AssociationSet Name="GameDomainDomainVariant" Association="Negotiation.Store.GameDomainDomainVariant">
+      <End Role="GameDomain" EntitySet="GameDomainSet" />
+      <End Role="DomainVariant" EntitySet="DomainVariantSet" />
+    </AssociationSet>
+    <AssociationSet Name="GameDomainConfigGameDomain" Association="Negotiation.Store.GameDomainConfigGameDomain">
+      <End Role="GameDomainConfig" EntitySet="GameDomainConfigSet" />
+      <End Role="GameDomain" EntitySet="GameDomainSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="NegotiationActionSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Type" Type="tinyint" Nullable="false" />
+    <Property Name="RemainingTime" Type="time" Nullable="false" />
+    <Property Name="Value" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="GameId" Type="int" Nullable="false" />
+    <Property Name="User_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="UserSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserString" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Type" Type="tinyint" Nullable="false" />
+    <Property Name="UserRole_Id" Type="int" Nullable="false" />
+    <Property Name="GameUser_User_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="UserRoleSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="GameSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="GameDomain_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="GameDomainSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DomainXML" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="UserResultSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="GameId" Type="int" Nullable="false" />
+    <Property Name="UserScore" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="StrategySet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DllMd5Hash" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="UserStrategy_Strategy_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="DomainVariantSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="VariantXML" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="GameDomainId" Type="int" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="GameDomainConfigSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="GameDomain_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="NegotiationActionUserId">
+    <End Role="NegotiationAction" Type="Negotiation.Store.NegotiationActionSet" Multiplicity="*" />
+    <End Role="UserId" Type="Negotiation.Store.UserSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="UserId">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="NegotiationAction">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserUserRole">
+    <End Role="User" Type="Negotiation.Store.UserSet" Multiplicity="*" />
+    <End Role="UserRole" Type="Negotiation.Store.UserRoleSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="UserRole">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User">
+        <PropertyRef Name="UserRole_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GameUser">
+    <End Role="Game" Type="Negotiation.Store.GameSet" Multiplicity="1" />
+    <End Role="User" Type="Negotiation.Store.UserSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Game">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User">
+        <PropertyRef Name="GameUser_User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GameNegotiationAction">
+    <End Role="Game" Type="Negotiation.Store.GameSet" Multiplicity="1" />
+    <End Role="NegotiationAction" Type="Negotiation.Store.NegotiationActionSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Game">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="NegotiationAction">
+        <PropertyRef Name="GameId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GameGameDomain">
+    <End Role="Game" Type="Negotiation.Store.GameSet" Multiplicity="*" />
+    <End Role="GameDomain" Type="Negotiation.Store.GameDomainSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="GameDomain">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Game">
+        <PropertyRef Name="GameDomain_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GameUserResult">
+    <End Role="Game" Type="Negotiation.Store.GameSet" Multiplicity="1" />
+    <End Role="UserResult" Type="Negotiation.Store.UserResultSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Game">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="UserResult">
+        <PropertyRef Name="GameId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserStrategy">
+    <End Role="User" Type="Negotiation.Store.UserSet" Multiplicity="1" />
+    <End Role="Strategy" Type="Negotiation.Store.StrategySet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Strategy">
+        <PropertyRef Name="UserStrategy_Strategy_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GameDomainDomainVariant">
+    <End Role="GameDomain" Type="Negotiation.Store.GameDomainSet" Multiplicity="1" />
+    <End Role="DomainVariant" Type="Negotiation.Store.DomainVariantSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="GameDomain">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="DomainVariant">
+        <PropertyRef Name="GameDomainId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GameDomainConfigGameDomain">
+    <End Role="GameDomainConfig" Type="Negotiation.Store.GameDomainConfigSet" Multiplicity="*" />
+    <End Role="GameDomain" Type="Negotiation.Store.GameDomainSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="GameDomain">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="GameDomainConfig">
+        <PropertyRef Name="GameDomain_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="Negotiation" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="NegotiationContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="NegotiationActionSet" EntityType="Negotiation.NegotiationAction" />
+          <EntitySet Name="UserSet" EntityType="Negotiation.User" />
+          <AssociationSet Name="NegotiationActionUserId" Association="Negotiation.NegotiationActionUserId">
+            <End Role="NegotiationAction" EntitySet="NegotiationActionSet" />
+            <End Role="UserId" EntitySet="UserSet" />
+          </AssociationSet>
+          <EntitySet Name="UserRoleSet" EntityType="Negotiation.UserRole" />
+          <AssociationSet Name="UserUserRole" Association="Negotiation.UserUserRole">
+            <End Role="User" EntitySet="UserSet" />
+            <End Role="UserRole" EntitySet="UserRoleSet" />
+          </AssociationSet>
+          <EntitySet Name="GameSet" EntityType="Negotiation.Game" />
+          <AssociationSet Name="GameUser" Association="Negotiation.GameUser">
+            <End Role="Game" EntitySet="GameSet" />
+            <End Role="User" EntitySet="UserSet" />
+          </AssociationSet>
+          <AssociationSet Name="GameNegotiationAction" Association="Negotiation.GameNegotiationAction">
+            <End Role="Game" EntitySet="GameSet" />
+            <End Role="NegotiationAction" EntitySet="NegotiationActionSet" />
+          </AssociationSet>
+          <EntitySet Name="GameDomainSet" EntityType="Negotiation.GameDomain" />
+          <AssociationSet Name="GameGameDomain" Association="Negotiation.GameGameDomain">
+            <End Role="Game" EntitySet="GameSet" />
+            <End Role="GameDomain" EntitySet="GameDomainSet" />
+          </AssociationSet>
+          <EntitySet Name="UserResultSet" EntityType="Negotiation.UserResult" />
+          <AssociationSet Name="GameUserResult" Association="Negotiation.GameUserResult">
+            <End Role="Game" EntitySet="GameSet" />
+            <End Role="UserResult" EntitySet="UserResultSet" />
+          </AssociationSet>
+          <EntitySet Name="StrategySet" EntityType="Negotiation.Strategy" />
+          <AssociationSet Name="UserStrategy" Association="Negotiation.UserStrategy">
+            <End Role="User" EntitySet="UserSet" />
+            <End Role="Strategy" EntitySet="StrategySet" />
+          </AssociationSet>
+          <EntitySet Name="DomainVariantSet" EntityType="Negotiation.DomainVariant" />
+          <AssociationSet Name="GameDomainDomainVariant" Association="Negotiation.GameDomainDomainVariant">
+            <End Role="GameDomain" EntitySet="GameDomainSet" />
+            <End Role="DomainVariant" EntitySet="DomainVariantSet" />
+          </AssociationSet>
+          <EntitySet Name="GameDomainConfigSet" EntityType="Negotiation.GameDomainConfig" />
+          <AssociationSet Name="GameDomainConfigGameDomain" Association="Negotiation.GameDomainConfigGameDomain">
+            <End Role="GameDomainConfig" EntitySet="GameDomainConfigSet" />
+            <End Role="GameDomain" EntitySet="GameDomainSet" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="NegotiationAction">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="Negotiation.NegotiationActionType" Nullable="false" />
+          <Property Name="RemainingTime" Type="Time" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="Negotiation.NegotiationActionUserId" FromRole="NegotiationAction" ToRole="UserId" />
+          <Property Name="Value" Type="String" Nullable="false" />
+          <Property Name="GameId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EnumType Name="NegotiationActionType" UnderlyingType="Byte">
+          <Member Name="Connect" />
+          <Member Name="MakeChange" />
+          <Member Name="MakeOffer" />
+          <Member Name="AcceptOffer" />
+          <Member Name="Optout" />
+          <Member Name="OptoutReceive" />
+          <Member Name="Disconnect" />
+        </EnumType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserString" Type="String" Nullable="false" />
+          <NavigationProperty Name="UserRole" Relationship="Negotiation.UserUserRole" FromRole="User" ToRole="UserRole" />
+          <Property Name="Type" Type="Negotiation.UserType" Nullable="false" />
+          <NavigationProperty Name="Strategy" Relationship="Negotiation.UserStrategy" FromRole="User" ToRole="Strategy" />
+        </EntityType>
+        <Association Name="NegotiationActionUserId">
+          <End Type="Negotiation.NegotiationAction" Role="NegotiationAction" Multiplicity="1" />
+          <End Type="Negotiation.User" Role="UserId" Multiplicity="1" />
+        </Association>
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="UserUserRole">
+          <End Type="Negotiation.User" Role="User" Multiplicity="1" />
+          <End Type="Negotiation.UserRole" Role="UserRole" Multiplicity="1" />
+        </Association>
+        <EntityType Name="Game">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Users" Relationship="Negotiation.GameUser" FromRole="Game" ToRole="User" />
+          <NavigationProperty Name="NegotiationAction" Relationship="Negotiation.GameNegotiationAction" FromRole="Game" ToRole="NegotiationAction" />
+          <NavigationProperty Name="GameDomain" Relationship="Negotiation.GameGameDomain" FromRole="Game" ToRole="GameDomain" />
+          <NavigationProperty Name="UserResult" Relationship="Negotiation.GameUserResult" FromRole="Game" ToRole="UserResult" />
+        </EntityType>
+        <Association Name="GameUser">
+          <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
+          <End Type="Negotiation.User" Role="User" Multiplicity="*" />
+        </Association>
+        <Association Name="GameNegotiationAction">
+          <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
+          <End Type="Negotiation.NegotiationAction" Role="NegotiationAction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Game">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NegotiationAction">
+              <PropertyRef Name="GameId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="GameDomain">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DomainXML" Type="String" Nullable="false" />
+          <NavigationProperty Name="DomainVariant" Relationship="Negotiation.GameDomainDomainVariant" FromRole="GameDomain" ToRole="DomainVariant" />
+          <Property Name="Name" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="GameGameDomain">
+          <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
+          <End Type="Negotiation.GameDomain" Role="GameDomain" Multiplicity="1" />
+        </Association>
+        <EntityType Name="UserResult">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GameId" Type="Int32" Nullable="false" />
+          <Property Name="UserScore" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="GameUserResult">
+          <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
+          <End Type="Negotiation.UserResult" Role="UserResult" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Game">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserResult">
+              <PropertyRef Name="GameId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EnumType Name="UserType" UnderlyingType="Byte">
+          <Member Name="Human" />
+          <Member Name="Agent" />
+        </EnumType>
+        <EntityType Name="Strategy">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DllMd5Hash" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="UserStrategy">
+          <End Type="Negotiation.User" Role="User" Multiplicity="1" />
+          <End Type="Negotiation.Strategy" Role="Strategy" Multiplicity="0..1" />
+        </Association>
+        <EntityType Name="DomainVariant">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="VariantXML" Type="String" Nullable="false" />
+          <Property Name="GameDomainId" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="GameDomainDomainVariant">
+          <End Type="Negotiation.GameDomain" Role="GameDomain" Multiplicity="1" />
+          <End Type="Negotiation.DomainVariant" Role="DomainVariant" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GameDomain">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DomainVariant">
+              <PropertyRef Name="GameDomainId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="GameDomainConfig">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="GameDomain" Relationship="Negotiation.GameDomainConfigGameDomain" FromRole="GameDomainConfig" ToRole="GameDomain" />
+        </EntityType>
+        <Association Name="GameDomainConfigGameDomain">
+          <End Type="Negotiation.GameDomainConfig" Role="GameDomainConfig" Multiplicity="1" />
+          <End Type="Negotiation.GameDomain" Role="GameDomain" Multiplicity="1" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="NegotiationStoreContainer" CdmEntityContainer="NegotiationContainer">
+    <EntitySetMapping Name="NegotiationActionSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.NegotiationAction)">
+        <MappingFragment StoreEntitySet="NegotiationActionSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="RemainingTime" ColumnName="RemainingTime" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
+          <ScalarProperty Name="GameId" ColumnName="GameId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.User)">
+        <MappingFragment StoreEntitySet="UserSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="UserString" ColumnName="UserString" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserRoleSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.UserRole)">
+        <MappingFragment StoreEntitySet="UserRoleSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GameSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.Game)">
+        <MappingFragment StoreEntitySet="GameSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GameDomainSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.GameDomain)">
+        <MappingFragment StoreEntitySet="GameDomainSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DomainXML" ColumnName="DomainXML" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserResultSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.UserResult)">
+        <MappingFragment StoreEntitySet="UserResultSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="GameId" ColumnName="GameId" />
+          <ScalarProperty Name="UserScore" ColumnName="UserScore" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="StrategySet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.Strategy)">
+        <MappingFragment StoreEntitySet="StrategySet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DllMd5Hash" ColumnName="DllMd5Hash" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DomainVariantSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.DomainVariant)">
+        <MappingFragment StoreEntitySet="DomainVariantSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="VariantXML" ColumnName="VariantXML" />
+          <ScalarProperty Name="GameDomainId" ColumnName="GameDomainId" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GameDomainConfigSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.GameDomainConfig)">
+        <MappingFragment StoreEntitySet="GameDomainConfigSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="NegotiationActionUserId" TypeName="Negotiation.NegotiationActionUserId" StoreEntitySet="NegotiationActionSet">
+      <EndProperty Name="UserId">
+        <ScalarProperty Name="Id" ColumnName="User_Id" />
+      </EndProperty>
+      <EndProperty Name="NegotiationAction">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="UserUserRole" TypeName="Negotiation.UserUserRole" StoreEntitySet="UserSet">
+      <EndProperty Name="UserRole">
+        <ScalarProperty Name="Id" ColumnName="UserRole_Id" />
+      </EndProperty>
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="GameUser" TypeName="Negotiation.GameUser" StoreEntitySet="UserSet">
+      <EndProperty Name="Game">
+        <ScalarProperty Name="Id" ColumnName="GameUser_User_Id" />
+      </EndProperty>
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="GameGameDomain" TypeName="Negotiation.GameGameDomain" StoreEntitySet="GameSet">
+      <EndProperty Name="GameDomain">
+        <ScalarProperty Name="Id" ColumnName="GameDomain_Id" />
+      </EndProperty>
+      <EndProperty Name="Game">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="UserStrategy" TypeName="Negotiation.UserStrategy" StoreEntitySet="StrategySet">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="UserStrategy_Strategy_Id" />
+      </EndProperty>
+      <EndProperty Name="Strategy">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="GameDomainConfigGameDomain" TypeName="Negotiation.GameDomainConfigGameDomain" StoreEntitySet="GameDomainConfigSet">
+      <EndProperty Name="GameDomain">
+        <ScalarProperty Name="Id" ColumnName="GameDomain_Id" />
+      </EndProperty>
+      <EndProperty Name="GameDomainConfig">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="4a1ab34b337e43ccbc5b0b8b788ac68b" Name="Diagram1">
+        <EntityTypeShape EntityType="Negotiation.NegotiationAction" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Negotiation.User" Width="1.5" PointX="5.25" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Negotiation.UserRole" Width="1.5" PointX="7.5" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Negotiation.Game" Width="1.5" PointX="0.75" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Negotiation.GameDomain" Width="1.5" PointX="3" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Negotiation.UserResult" Width="1.5" PointX="3" PointY="12.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Negotiation.Strategy" Width="1.5" PointX="7.5" PointY="6.125" IsExpanded="true" />
+        <AssociationConnector Association="Negotiation.NegotiationActionUserId" ManuallyRouted="false" />
+        <AssociationConnector Association="Negotiation.UserUserRole" ManuallyRouted="false" />
+        <AssociationConnector Association="Negotiation.GameUser" ManuallyRouted="false" />
+        <AssociationConnector Association="Negotiation.GameNegotiationAction" ManuallyRouted="false" />
+        <AssociationConnector Association="Negotiation.GameGameDomain" ManuallyRouted="false" />
+        <AssociationConnector Association="Negotiation.GameUserResult" ManuallyRouted="false" />
+        <AssociationConnector Association="Negotiation.UserStrategy" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="Negotiation.DomainVariant" Width="1.5" PointX="5.75" PointY="10.875" />
+        <AssociationConnector Association="Negotiation.GameDomainDomainVariant" />
+        <EntityTypeShape EntityType="Negotiation.GameDomainConfig" Width="1.5" PointX="3.375" PointY="8.75" />
+        <AssociationConnector Association="Negotiation.GameDomainConfigGameDomain" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

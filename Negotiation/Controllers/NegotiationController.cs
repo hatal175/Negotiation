@@ -52,7 +52,7 @@ namespace Negotiation.Controllers
         private string CreateNewNegotiation()
         {
             string id = this.Request.UserHostAddress + ";" + DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture);
-            NegotiationEngine engine = new NegotiationEngine(null, null, NegotiationConfig.GetHumanConfig(), NegotiationConfig.GetAiConfig());
+            NegotiationEngine engine = new NegotiationEngine(NegotiationDomainManager.Domain, null, NegotiationDomainManager.GetHumanConfig(), NegotiationDomainManager.GetAiConfig());
 
             _onGoingNegotiations.Add(id, engine);
 
@@ -61,7 +61,7 @@ namespace Negotiation.Controllers
 
         public ActionResult NegotiationTutorial(NegotiationTutorialModel model)
         {
-            return View(model);
+            return View("NegotiationTutorial",model);
         }
 
         private NegotiationTutorialModel CreateTutorialModel(string id)
@@ -72,8 +72,11 @@ namespace Negotiation.Controllers
 
             NegotiationSideDescription desc = engine.Domain.OwnerVariantDict[config.Side][config.Variant];
 
+            int optoutend = (desc.Optout + desc.TimeEffect * NegotiationDomainManager.TotalRounds);
+
             return new NegotiationTutorialModel
             {
+                Id = id,
                 Questions = new List<QuestionModel>
                 {
                     new QuestionModel 
@@ -86,7 +89,7 @@ namespace Negotiation.Controllers
                     new QuestionModel 
                     {
                         Question = "If the same agreement was reached in round 3 or in round 6, which of the following is correct?",
-                        Options = 
+                        Options = new List<string>
                         {
                             "They have the same score.",
                             "Round 3 will have a higher score.",
@@ -98,19 +101,18 @@ namespace Negotiation.Controllers
                     new QuestionModel 
                     {
                         Question = "What is your score if no agreement had been reached by the end of the last round?",
-                        Options = 
+                        Options = new List<string>
                         {
                             "0",
                             "No score - you have lost the negotiation",
-                            (desc.Optout + desc.TimeEffect * NegotiationConfig.TotalRounds).ToString()
+                            optoutend.ToString()
                         },
-                        ActualAnswer = (desc.Optout + desc.TimeEffect * NegotiationConfig.TotalRounds).ToString()
-                        
+                        ActualAnswer = optoutend.ToString()
                     },
                     new QuestionModel 
                     {
                         Question = "What is the meaning of \"opting out\"?",
-                        Options = 
+                        Options = new List<string>
                         {
                             "It means that the other side won the negotiation.",
                             "It means you get a predetermined amount of points minus the time decrease."
@@ -124,14 +126,42 @@ namespace Negotiation.Controllers
         public ActionResult SubmitTutorialAnswers(NegotiationTutorialModel model)
         {
             if (!model.Questions.Select(x=>x.Answer).SequenceEqual(model.Questions.Select(x=>x.ActualAnswer)))
-                return View("NegotiationTutorial");
+                return View("NegotiationTutorial", model);
 
-            return View("Negotiation");
+            NegotiationEngine engine = _onGoingNegotiations[model.Id];
+
+            NegotiationViewModel newModel = new NegotiationViewModel
+            {
+                Id = model.Id,
+                AiSide = engine.AiConfig.Side,
+                HumanConfig = engine.HumanConfig,
+                RemainingTime = TimeSpan.FromSeconds(engine.Domain.NumberOfRounds * engine.Domain.RoundLength.TotalSeconds),
+                Domain = engine.Domain,
+                Actions = new List<NegotiationAction>()
+
+            };
+
+            return View("Negotiation", newModel);
         }
 
         public ActionResult Negotiation(NegotiationViewModel model)
         {
             return View(model);
+        }
+
+        public ActionResult NegotiationConfiguration()
+        {
+            return View();
+        }
+
+        public ActionResult NewActiveDomain(NegotiationConfigurationModel model)
+        {
+            if (NegotiationDomainManager.GameDomain.Name != model.ActiveDomain)
+            {
+
+            }
+
+            return View("NegotiationConfiguration");
         }
     }
 }
