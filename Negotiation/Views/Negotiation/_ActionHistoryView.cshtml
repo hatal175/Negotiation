@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Negotiation.Models.NegotiationActionModel>
+@{
+    Layout = null;
+}
+
+<div id="actionHistory" style="border-style:solid; border-color:turquoise">
+    <h2>History of actions</h2>
+    <table border="1">
+        <tr>
+            <th>
+                Proposer
+            </th>
+            <th>
+                Action
+            </th>
+            <th>
+                Value
+            </th>
+        </tr>
+        @foreach (var action in Model)
+        {
+            <tr>
+                <td>
+                    @action.Role
+                </td>
+                <td>
+                    @action.Type
+                </td>
+                <td>
+                    @action.Value
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+

@@ -5,13 +5,11 @@
 }
 
 <div style="width:100%; display:table">
+    <div style="display:table-column"></div>
+    <div id="yourScoreTable" style="display:table-column; width:300px; border-style:dashed; border-color:gray; visibility:collapse" ></div>
+    <div id="partnerScoreTable" style="display:table-column; width:400px; border-style:dashed; border-color:gray; visibility:collapse" ></div>
+    
     <div style="display:table-row">
-        <div id="yourScoreTable" style="display:table-cell; width:300px; visibility:collapse; border-style:dashed; border-color:gray">
-            @Html.Partial("NegotiationSideView", new List<Negotiation.Models.NegotiationSideDescription>() { Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant] })
-        </div>
-        <div id="partnerScoreTable" style="display:table-cell; width:400px; visibility:collapse; border-style:dashed; border-color:gray">
-            @Html.Partial("NegotiationSideView", Model.Domain.OwnerVariantDict[Model.AiSide].Values)
-        </div>
         <div style="display:table-cell">
             <div style="border-style:solid; border-color:purple">
                 <table>
@@ -20,15 +18,15 @@
                             Your role: @Model.HumanConfig.Side
                         </td>
                         <td>
-                            Remaining Time: @Model.RemainingTime
+                            @Html.Partial("NegotiationTimerView",@Model.RemainingTime)
                         </td>
                         <td>
-                            <button onclick="toggleTableId('#yourscoretable')">
+                            <button onclick="toggleTableId('yourScoreTable')">
                                 Your scores
                             </button>
                         </td>
                         <td>
-                            <button onclick="toggleTableId('#partnerScoreTable')">
+                            <button onclick="toggleTableId('partnerScoreTable')">
                                 Partner's scores
                             </button>
                         </td>
@@ -59,82 +57,210 @@
                 </ul>
                 <table>
                     <tr>
-                        <td>
-                            <b>Issue:</b>
-                        </td>
-                        <td>
-                            <b>Options:</b>
-                        </td>
+                        <th>
+                            Your Offer:
+                        </th>
+                        <th>
+                            Opponent Offer:
+                        </th>
                     </tr>
-                    @foreach (var topic in Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].Topics)
-                    {
-                        <tr>
-                            <td>
-                                @topic.Key + ":"
-                            </td>
-                            <td>
-                                @Html.DropDownListFor(m => m.Offer.Offers[topic.Key], topic.Value.Options.Values.Select(x => new SelectListItem { Text = x.Name, Value = x.Name }))
-                            </td>
-                        </tr>
-                    }
                     <tr>
-                        <td>
-                            Your score:
+                        <td valign="top">
+                            @using (Ajax.BeginForm("SendOffer", new AjaxOptions() { HttpMethod = "Post",UpdateTargetId="bogus"}))
+                            {
+                                @Html.Hidden("negotiationId", Model.Id)
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <b>Issue:</b>
+                                        </td>
+                                        <td>
+                                            <b>Options:</b>
+                                        </td>
+                                    </tr>
+                                    @foreach (var topic in Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].Topics)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(topic.Key + ":")
+                                            </td>
+                                            <td>
+                                                @Html.DropDownList("offer.Offers[" + topic.Key + "].TopicValue",
+                                                topic.Value.Options.Values.Select(x => new SelectListItem { Text = x.Name, Value = x.Name }),
+                                             new { id = "Offer_" + topic.Key, data_id = "Offer", onchange = "recheckOffer()" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td>
+                                            <b>Your Score:</b>
+                                        </td>
+                                        <td>
+                                            @(Model.Offer.Offers.Values.Sum(x => int.Parse(x.TopicValue)) + Model.Domain.RoundsPassed(Model.RemainingTime) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
+                                        </td>
+                                    </tr>
+                                </table>
+                                <button onclick="sendOffer()">Send Offer</button> 
+                            }
+                            or reply to recent partner's offer: <button>Accept</button>  <button>Reject</button><br />
                         </td>
-                        <td>
-                            @(Model.Offer.Offers.Values.Sum(x => int.Parse(x.TopicValue)) + (((int)(Model.Domain.RoundLength.TotalSeconds * Model.Domain.NumberOfRounds - Model.RemainingTime.TotalSeconds)) / (int)Model.Domain.RoundLength.TotalSeconds) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
+                        <td valign="top">
+                            <div id="opponentOffer">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <b>Issue:</b>
+                                        </td>
+                                    </tr>
+                                    @foreach (var topic in Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].Topics)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(topic.Key + ":")
+                                            </td>
+                                            <td id='opOffer_@(topic.Key)'>
+                                                @{
+                                        Negotiation.Models.NegotiationTopicOffer value;
+                                        var x = Model.OpponentOffer.Offers.TryGetValue(topic.Key, out value);
+
+                                        if (x)
+                                        {
+                                            @value
+                                        }
+                                        else
+                                        {
+                                            @:---
+                                                }
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
                         </td>
+
                     </tr>
                 </table>
-                <button>Send Offer</button> or reply to recent partner's offer: <button>Accept</button>  <button>Reject</button><br />
                 <button>Sign the agreement</button>
             </div>
-            <div style="border-style:solid; border-color:turquoise">
-                <h2>History of actions</h2>
-                <table>
-                    <tr>
-                        <th>
-                            Proposer
-                        </th>
-                        <th>
-                            Action
-                        </th>
-                        <th>
-                            Value
-                        </th>
-                    </tr>
-                    @foreach (var action in Model.Actions)
-                    {
-                        <tr>
-                            <td>
-                                @action.Role
-                            </td>
-                            <td>
-                                @action.Type
-                            </td>
-                            <td>
-                                @action.Value
-                            </td>
-                        </tr>
-                    }
-                </table>
-            </div>
-            <div style="border-style:solid; border-color:black">
-                <b>Click here to quit the negotiation immediately: <button>Opt Out</button></b>
-            </div>
+            @Html.Partial("_ActionHistoryView",Model.Actions)
+            @using (Html.BeginForm("OptOut", "Negotiation", FormMethod.Post))
+            {
+                @Html.Hidden("NegotiationId", Model.Id)
+                <div style="border-style:solid; border-color:black">
+               
+                    <b>Click here to quit the negotiation immediately: <button type="submit">Opt Out</button></b>
+                
+                </div>
+            }
+        </div>
+        <div style="display:table-cell;">
+            <button onclick="toggleTableId('yourScoreTable')">close:</button>
+            Your score table:<br />
+            @Html.Partial("NegotiationSideView", new List<Negotiation.Models.NegotiationSideDescription>() { Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant] })
+        </div>
+        <div style="display:table-cell;">
+            <button onclick="toggleTableId('partnerScoreTable')">close:</button>
+            Your partner score table:<br />
+            @Html.Partial("NegotiationSideView", Model.Domain.OwnerVariantDict[Model.AiSide].Values)
         </div>
     </div>
 </div>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
 <script type="text/javascript">
     toggleTableId = function (tableId) {
-        if ($(tableId).visible == "collapsed") {
-            $(tableId).visible = "visible";
+        var tab = document.getElementById(tableId);
+        if (tab.style.visibility == "collapse") {
+            tab.style.visibility = "visible";
         }
         else {
-            $(tableId).visible = "collapsed";
+            tab.style.visibility = "collapse";
         }
     };
+
+    @*sendOffer = function () {
+        var data = {
+            negotiationId : "@Model.Id",
+            Offer : @Html.Raw(Json.Encode(Model.Offer))
+            };
+        $.ajax({ url: 'SendOffer', type: "POST", data: JSON.stringify(data), contentType: 'application/json' });
+    }*@
+
+    acceptOffer = function () {
+        var data = {
+            negotiationId : "@Model.Id"
+            };
+        $.ajax({ url: 'AcceptOffer', type: "POST", data: JSON.stringify(data), contentType: 'application/json' });
+    }
+
+    updateOpponentOffer = function() {
+        var data = {
+            negotiationId : "@Model.Id"
+        };
+        $.ajax({ url: 'UpdateOpponentOffer',
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success : function(result) {
+                $('#opponentOffer').html(result);
+                recheckOffer();
+            }
+        });
+    }
+
+    window.setInterval(updateOpponentOffer, 2000);
+
+    updateActionHistory = function() {
+        var data = {
+            negotiationId : "@Model.Id"
+        };
+        $.ajax({ url: 'UpdateActionHistory',
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success : function(result) {
+                $('#actionHistory').html(result);
+            }
+        });
+    }
+
+    window.setInterval(updateActionHistory, 2000);
+
+    updateTimer = function() {
+        var data = {
+            negotiationId : "@Model.Id"
+        };
+        $.ajax({ url: 'UpdateTimer',
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success : function(result) {
+                $('#negotiationTimer').html(result);
+            }
+        });
+    };
+
+    window.setInterval(updateTimer, 500);
+
+    recheckOffer = function () {
+        $('[data-id="Offer"]').each(function(index,offer) {
+            var offer_id = offer["id"];
+            var op_offer = document.getElementById('op'+offer_id);
+
+            if (offer.selectedIndex == -1 || offer.options[offer.selectedIndex].text != op_offer.text) {
+                offer.style.backgroundColor = "Pink";
+            }
+            else {
+                offer.style.backgroundColor = "LightGreen";
+            }
+        });
+    };
+
+    recheckOffer();
 </script>
+
+
 
 
 

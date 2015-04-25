@@ -12,6 +12,7 @@ namespace Negotiation.Models
         {
             Actions = new List<NegotiationActionModel>();
             Offer = new NegotiationOffer();
+            OpponentOffer = new NegotiationOffer();
         }
 
         public String Id { get; set; }
@@ -21,6 +22,7 @@ namespace Negotiation.Models
         public NegotiationDomain Domain { get; set; }
 
         public NegotiationOffer Offer { get; set; }
+        public NegotiationOffer OpponentOffer { get; set; }
 
         public TimeSpan RemainingTime { get; set; }
 

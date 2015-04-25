@@ -7,7 +7,8 @@ namespace Negotiation.Models
 {
     public class NegotiationStatus
     {
-        public NegotiationOffer[] OpenOffers { get; set; }
+        public NegotiationOffer HumanOffer { get; set; }
+        public NegotiationOffer AiOffer { get; set; }
         public TimeSpan RemainingTime { get; set; }
     }
 }

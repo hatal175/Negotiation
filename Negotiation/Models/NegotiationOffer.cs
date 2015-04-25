@@ -13,5 +13,7 @@ namespace Negotiation.Models
         }
 
         public Dictionary<String,NegotiationTopicOffer> Offers { get; set; }
+
+        public int Score { get; set; }
     }
 }

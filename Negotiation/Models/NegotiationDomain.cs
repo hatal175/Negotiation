@@ -18,6 +18,10 @@ namespace Negotiation.Models
         public TimeSpan RoundLength { get; set; }
         public int NumberOfRounds { get; set; }
 
+        public int RoundsPassed(TimeSpan remainingTime)
+        {
+            return (((int)(RoundLength.TotalSeconds * NumberOfRounds - remainingTime.TotalSeconds)) / (int)RoundLength.TotalSeconds);
+        }
 
         public void Extract(System.Xml.XmlNode node)
         {
@@ -43,6 +47,8 @@ namespace Negotiation.Models
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(NegotiationManager.GameDomain.DomainVariant.First(x => x.Name == node.Attributes["utility_space"].Value).VariantXML);
             desc.Extract(doc);
+
+            desc.Name = node.Attributes["personality"].Value;
 
             return desc;
         }

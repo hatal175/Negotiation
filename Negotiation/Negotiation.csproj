@@ -207,6 +207,7 @@
     </Compile>
     <Compile Include="Models\NegotiationActionModel.cs" />
     <Compile Include="Models\NegotiationConfigurationModel.cs" />
+    <Compile Include="Models\NegotiationEndModel.cs" />
     <Compile Include="Models\NegotiationManager.cs" />
     <Compile Include="Models\NegotiationTutorialModel.cs" />
     <Compile Include="Models\IAgentStrategy.cs" />
@@ -334,6 +335,10 @@
     <Content Include="Views\Negotiation\Negotiation.cshtml" />
     <Content Include="Views\Negotiation\NegotiationSideView.cshtml" />
     <Content Include="Views\Negotiation\NegotiationConfiguration.cshtml" />
+    <Content Include="Views\Negotiation\_OfferView.cshtml" />
+    <Content Include="Views\Negotiation\_ActionHistoryView.cshtml" />
+    <Content Include="Views\Negotiation\NegotiationEndView.cshtml" />
+    <Content Include="Views\Negotiation\NegotiationTimerView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

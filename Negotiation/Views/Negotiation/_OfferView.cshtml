@@ -1,0 +1,22 @@
+﻿@model Negotiation.Models.NegotiationOffer
+@{
+    Layout = null;
+}
+<table>
+    <tr>
+        <td>
+            <b>Issue:</b>
+        </td>
+    </tr>
+    @foreach (var topic in Model.Offers)
+    {
+        <tr>
+            <td>
+                @(topic.Key + ":")
+            </td>
+            <td id='opOffer_@(topic.Key)'>
+                @topic.Value.TopicValue
+            </td>
+        </tr>
+    }
+</table>

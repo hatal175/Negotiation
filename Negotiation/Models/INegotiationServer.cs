@@ -20,5 +20,8 @@ namespace Negotiation.Models
     {
         event EventHandler<NewOfferEventArgs> NewOfferEvent;
         event EventHandler OfferAcceptedEvent;
+        event EventHandler OptOutEvent;
+
+        void NegotiationStarted();
     }
 }

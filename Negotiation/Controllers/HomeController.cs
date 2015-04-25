@@ -10,7 +10,7 @@ namespace Negotiation.Controllers
     {
         public ActionResult Index()
         {
-            return RedirectToAction("Index","Negotiation");
+            return RedirectToAction("PreNegotiationQuestionnaire", "Negotiation");
         }
 
         public ActionResult About()

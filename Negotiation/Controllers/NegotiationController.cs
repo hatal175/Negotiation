@@ -11,10 +11,6 @@ namespace Negotiation.Controllers
 {
     public class NegotiationController : Controller
     {
-        
-
-        
-
         // GET: Negotiation
         public ActionResult Index()
         {
@@ -50,7 +46,13 @@ namespace Negotiation.Controllers
         private string CreateNewNegotiation()
         {
             string id = this.Request.UserHostAddress + ";" + DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture);
-            NegotiationEngine engine = new NegotiationEngine(NegotiationManager.Domain, null, NegotiationManager.GetHumanConfig(), NegotiationManager.GetAiConfig());
+            NegotiationEngine engine = 
+                new NegotiationEngine(
+                    NegotiationManager.Domain, 
+                    new LocalNegotiationChannel(),
+                    new LocalNegotiationChannel(), 
+                    NegotiationManager.GetHumanConfig(), 
+                    NegotiationManager.GetAiConfig());
 
             NegotiationManager.OnGoingNegotiations.TryAdd(id, engine);
 
@@ -123,6 +125,10 @@ namespace Negotiation.Controllers
 
         public ActionResult SubmitTutorialAnswers(NegotiationTutorialModel model)
         {
+            if (model == null)
+            {
+                return RedirectToAction("Negotiation");
+            }
             //if (!model.Questions.Select(x => x.Answer).SequenceEqual(NegotiationManager.TutorialModels[model.TutorialId].Questions.Select(x => x.ActualAnswer)))
             //{
             //    return View("NegotiationTutorial", NegotiationManager.TutorialModels[model.TutorialId]);
@@ -144,12 +150,68 @@ namespace Negotiation.Controllers
 
             };
 
+            engine.BeginNegotiation();
+
             return View("Negotiation", newModel);
         }
 
         public ActionResult Negotiation(NegotiationViewModel model)
         {
             return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult SendOffer(String negotiationId, NegotiationOffer offer)
+        {
+            NegotiationManager.OnGoingNegotiations[negotiationId].HumanChannel.SendOffer(offer);
+
+            return new HttpStatusCodeResult(System.Net.HttpStatusCode.Accepted);
+        }
+
+        [HttpPost]
+        public ActionResult AcceptOffer(String negotiationId)
+        {
+            NegotiationManager.OnGoingNegotiations[negotiationId].HumanChannel.AcceptOffer();
+
+            return new HttpStatusCodeResult(System.Net.HttpStatusCode.Accepted);
+        }
+
+        public ActionResult UpdateOpponentOffer(String negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            return PartialView("_OfferView", engine.Status.AiOffer);
+        }
+
+        public ActionResult UpdateActionHistory(String negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            return PartialView("_ActionHistoryView", engine.Actions);
+        }
+
+        public ActionResult OptOut(String negotiationId)
+        {
+            NegotiationManager.OnGoingNegotiations[negotiationId].HumanChannel.OptOut();
+            return View("NegotiationEndView",
+                new NegotiationEndModel()
+                {
+                    Score = NegotiationManager.OnGoingNegotiations[negotiationId].Status.HumanOffer.Score,
+                    Message = "You opted out."
+                });
+        }
+
+        public ActionResult UpdateTimer(String negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId==null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            return PartialView("NegotiationTimerView", engine.Status.RemainingTime);
         }
 
         public ActionResult NegotiationConfiguration()

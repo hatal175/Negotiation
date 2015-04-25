@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Negotiation.Models.NegotiationSideDescription>
 @{
-    <table>
+    <table border="1">
         <tr>
             <th>Values</th>
             @if (Model.Count() == 1)
@@ -18,7 +18,7 @@
         @foreach (var topic in Model.First().Topics.Keys)
         {
             <tr>
-                <td>
+                <td colspan="@(Model.Count() + 1)" style="text-align:center">
                     <b>@topic</b>
                 </td>
             </tr>
@@ -26,21 +26,26 @@
             {
                 <tr>
                     <td>@optionName</td>
-                    @foreach (var option in Model.Select(x=>x.Topics[topic].Options[optionName]))
+                    @foreach (var option in Model.Select(x => x.Topics[topic].Options[optionName]))
                     {
-                        <td>@String.Format("+#;-#;0", option.Score)</td>
+                        <td>@String.Format("{0:+#;-#;0}", option.Score)</td>
                     }
                 </tr>
             }
         }
         <tr>
+            <td colspan="@(Model.Count() + 1)" style="text-align:center">
+                <b>Time Effects:</b>
+            </td>
+        </tr>
+        <tr>
             <td>
                 Decrease per @Negotiation.App_Start.NegotiationConfig.RoundLength.TotalSeconds sec:
             </td>
-            @foreach (var time in Model.Select(x=>x.TimeEffect))
-            { 
+            @foreach (var time in Model.Select(x => x.TimeEffect))
+            {
                 <td>
-                    @String.Format("+#;-#;0", time)
+                    @String.Format("{0:+#;-#;0}", time)
                 </td>
             }
         </tr>
@@ -51,7 +56,7 @@
             @foreach (var optout in Model.Select(x => x.Optout))
             {
                 <td>
-                    @String.Format("+#;-#;0", optout)
+                    @String.Format("{0:+#;-#;0}", optout)
                 </td>
             }
         </tr>
@@ -62,10 +67,10 @@
             @foreach (var statusQuoScore in Model.Select(x => x.StatusQuoScore))
             {
                 <td>
-                    @String.Format("+#;-#;0", statusQuoScore)
+                    @String.Format("{0:+#;-#;0}", statusQuoScore)
                 </td>
             }
         </tr>
-        
+
     </table>
 }

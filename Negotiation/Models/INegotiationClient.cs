@@ -8,7 +8,10 @@ namespace Negotiation.Models
 {
     public interface INegotiationClient
     {
+        void OptOut();
         void SendOffer(NegotiationOffer offer);
         void AcceptOffer();
+
+        event EventHandler NegotiationStartedEvent;
     }
 }

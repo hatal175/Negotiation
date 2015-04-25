@@ -1,0 +1,21 @@
+﻿@model Negotiation.Models.NegotiationEndModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>NegotiationEndView</title>
+</head>
+<body>
+    <div> 
+        <h1>Negotiation Result:</h1>
+        <h3>@Model.Message</h3>
+        <br />
+        <h3>Final Score: @Model.Score</h3>
+    </div>
+</body>
+</html>

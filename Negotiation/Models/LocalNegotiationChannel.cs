@@ -9,16 +9,45 @@ namespace Negotiation.Models
     {
         public void SendOffer(NegotiationOffer offer)
         {
-            NewOfferEvent(this, new NewOfferEventArgs(offer));
+            if (NewOfferEvent != null)
+            {
+                NewOfferEvent(this, new NewOfferEventArgs(offer));
+            }
         }
 
         public void AcceptOffer()
         {
-            OfferAcceptedEvent(this, EventArgs.Empty);
+            if (OfferAcceptedEvent != null)
+            {
+                OfferAcceptedEvent(this, EventArgs.Empty);
+            }
         }
 
         public event EventHandler<NewOfferEventArgs> NewOfferEvent;
 
         public event EventHandler OfferAcceptedEvent;
+
+        public void OptOut()
+        {
+            if (OptOutEvent != null)
+            {
+                OptOutEvent(this, EventArgs.Empty);
+            }
+        }
+
+
+        public event EventHandler OptOutEvent;
+
+
+        public event EventHandler NegotiationStartedEvent;
+
+
+        public void NegotiationStarted()
+        {
+            if (NegotiationStartedEvent != null)
+            {
+                NegotiationStartedEvent(this, EventArgs.Empty);
+            }
+        }
     }
 }
