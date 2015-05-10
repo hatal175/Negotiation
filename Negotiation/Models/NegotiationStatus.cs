@@ -10,5 +10,6 @@ namespace Negotiation.Models
         public NegotiationOffer HumanOffer { get; set; }
         public NegotiationOffer AiOffer { get; set; }
         public TimeSpan RemainingTime { get; set; }
+        public NegotiationState State {get; set;}
     }
 }

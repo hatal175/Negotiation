@@ -34,7 +34,7 @@
                 </table>
             </div>
             <div style="border-style:solid; border-color:blue">
-                Use the menuts below to select your offer <br />
+                Use the menus below to select your offer <br />
                 <ul>
                     <li>
                         You play the role of the <b>@Model.HumanConfig.Side</b>.
@@ -66,7 +66,7 @@
                     </tr>
                     <tr>
                         <td valign="top">
-                            @using (Ajax.BeginForm("SendOffer", new AjaxOptions() { HttpMethod = "Post",UpdateTargetId="bogus"}))
+                            @using (Ajax.BeginForm("SendOffer", new AjaxOptions() { HttpMethod = "Post",UpdateTargetId="bogus", InsertionMode=InsertionMode.Replace}))
                             {
                                 @Html.Hidden("negotiationId", Model.Id)
                                 <table>
@@ -85,9 +85,18 @@
                                                 @(topic.Key + ":")
                                             </td>
                                             <td>
-                                                @Html.DropDownList("offer.Offers[" + topic.Key + "].TopicValue",
-                                                topic.Value.Options.Values.Select(x => new SelectListItem { Text = x.Name, Value = x.Name }),
-                                             new { id = "Offer_" + topic.Key, data_id = "Offer", onchange = "recheckOffer()" })
+                                                <select name="@Html.Name("offer.Offers[" + topic.Key + "].TopicValue")"
+                                                        id=@("Offer_" + topic.Key)
+                                                        onchange="recheckOffer()"
+                                                        data_id="Offer">
+                                                    @foreach (var option in topic.Value.Options.Values)
+                                                    {
+                                                        <option value="@option.Name"
+                                                                data-score="@option.Score">
+                                                            @option.Name
+                                                        </option>
+                                                    }
+                                                </select>
                                             </td>
                                         </tr>
                                     }
@@ -95,14 +104,14 @@
                                         <td>
                                             <b>Your Score:</b>
                                         </td>
-                                        <td>
+                                        <td id="yourScore">
                                             @(Model.Offer.Offers.Values.Sum(x => int.Parse(x.TopicValue)) + Model.Domain.RoundsPassed(Model.RemainingTime) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
                                         </td>
                                     </tr>
                                 </table>
-                                <button onclick="sendOffer()">Send Offer</button> 
+                                <input type="submit" class="btn btn-default" value="Send Offer" />
                             }
-                            or reply to recent partner's offer: <button>Accept</button>  <button>Reject</button><br />
+                            or reply to recent partner's offer: @using (Html.BeginForm("AcceptOffer", "Negotiation", FormMethod.Post)) {@Html.Hidden("negotiationId", Model.Id) <input id="acceptButton" type="submit" class="btn btn-default" value="Accept" disabled/>} <br />
                         </td>
                         <td valign="top">
                             <div id="opponentOffer">
@@ -122,14 +131,10 @@
                                                 @{
                                         Negotiation.Models.NegotiationTopicOffer value;
                                         var x = Model.OpponentOffer.Offers.TryGetValue(topic.Key, out value);
-
                                         if (x)
-                                        {
-                                            @value
-                                        }
+                                        {@value}
                                         else
-                                        {
-                                            @:---
+                                        {@:---
                                                 }
                                                 }
                                             </td>
@@ -157,7 +162,7 @@
         <div style="display:table-cell;">
             <button onclick="toggleTableId('yourScoreTable')">close:</button>
             Your score table:<br />
-            @Html.Partial("NegotiationSideView", new List<Negotiation.Models.NegotiationSideDescription>() { Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant] })
+            @Html.Partial("NegotiationSideView", new List<Negotiation.Models.NegotiationSideDescription>() { Model.Domain.GetSideDescription(Model.HumanConfig) })
         </div>
         <div style="display:table-cell;">
             <button onclick="toggleTableId('partnerScoreTable')">close:</button>
@@ -165,9 +170,14 @@
             @Html.Partial("NegotiationSideView", Model.Domain.OwnerVariantDict[Model.AiSide].Values)
         </div>
     </div>
+    <div style="visibility:hidden" id="bogus"></div>
 </div>
 @Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/jqueryajax")
 @Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/datetime.1-1")
+
 <script type="text/javascript">
     toggleTableId = function (tableId) {
         var tab = document.getElementById(tableId);
@@ -178,14 +188,6 @@
             tab.style.visibility = "collapse";
         }
     };
-
-    @*sendOffer = function () {
-        var data = {
-            negotiationId : "@Model.Id",
-            Offer : @Html.Raw(Json.Encode(Model.Offer))
-            };
-        $.ajax({ url: 'SendOffer', type: "POST", data: JSON.stringify(data), contentType: 'application/json' });
-    }*@
 
     acceptOffer = function () {
         var data = {
@@ -243,18 +245,45 @@
 
     window.setInterval(updateTimer, 500);
 
+    getTimeScore = function () {
+        scorePerRound = @Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect;
+        
+        negotiationTimer = document.getElementById("negotiationTimerText");
+        timeText = negotiationTimer.innerText;
+        timeArr = timeText.split(":");
+        timeLeft = TimeSpan(timeArr[0],timeArr[1],timeArr[2]).TotalSeconds();
+
+        totalTime = @(Model.Domain.RoundLength.TotalSeconds * Model.Domain.NumberOfRounds);
+
+        return Math.floor((totalTime - timeLeft) / @Model.Domain.RoundLength.TotalSeconds);
+    };
+
     recheckOffer = function () {
+
+        scoreSum = 0;
+
         $('[data-id="Offer"]').each(function(index,offer) {
             var offer_id = offer["id"];
             var op_offer = document.getElementById('op'+offer_id);
 
-            if (offer.selectedIndex == -1 || offer.options[offer.selectedIndex].text != op_offer.text) {
-                offer.style.backgroundColor = "Pink";
+            if (op_offer.innerHTML.trim() == "---") {
+                offer.style.backgroundColor = "White";
             }
             else {
-                offer.style.backgroundColor = "LightGreen";
+                document.getElementById("myBtn").disabled = false;
+
+                if (offer.selectedIndex == -1 || offer.options[offer.selectedIndex].text != op_offer.text) {
+                    offer.style.backgroundColor = "Pink";
+                }
+                else {
+                    offer.style.backgroundColor = "LightGreen";
+                }
             }
+
+            scoreSum += offer.options[offer.selectedIndex]["data-score"];
         });
+
+        document.getElementById("yourScore").text = scoreSum;
     };
 
     recheckOffer();

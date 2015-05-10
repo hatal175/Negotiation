@@ -18,6 +18,11 @@ namespace Negotiation.Models
         public TimeSpan RoundLength { get; set; }
         public int NumberOfRounds { get; set; }
 
+        public NegotiationSideDescription GetSideDescription(SideConfig config)
+        {
+            return OwnerVariantDict[config.Side][config.Variant];
+        }
+
         public int RoundsPassed(TimeSpan remainingTime)
         {
             return (((int)(RoundLength.TotalSeconds * NumberOfRounds - remainingTime.TotalSeconds)) / (int)RoundLength.TotalSeconds);

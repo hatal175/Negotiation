@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Negotiation.Models
 {
-    public class NewOfferEventArgs : EventArgs
+    public class OfferEventArgs : EventArgs
     {
-        public NewOfferEventArgs(NegotiationOffer offer)
+        public OfferEventArgs(NegotiationOffer offer)
         {
             Offer = offer;
         }
@@ -18,10 +18,14 @@ namespace Negotiation.Models
 
     public interface INegotiationServer
     {
-        event EventHandler<NewOfferEventArgs> NewOfferEvent;
+        event EventHandler<OfferEventArgs> NewOfferEvent;
         event EventHandler OfferAcceptedEvent;
         event EventHandler OptOutEvent;
-
+        
         void NegotiationStarted();
+        void OpponentOfferReceived(NegotiationOffer offer);
+        void OpponentAcceptedOffer();
+        void OpponentOptOutReceived();
+        void TimeOut();
     }
 }

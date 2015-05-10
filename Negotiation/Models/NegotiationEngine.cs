@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Timers;
 using System.Web;
 
@@ -9,17 +10,15 @@ namespace Negotiation.Models
 {
     public class NegotiationEngine
     {
-        private Timer _timer;
+        private System.Timers.Timer _timer;
 
         public NegotiationEngine(NegotiationDomain domain, 
-            INegotiationChannel humanChannel,
-            INegotiationChannel aiChannel,
             SideConfig humanConfig,
             SideConfig aiConfig)
         {
             Domain = domain;
-            HumanChannel = humanChannel;
-            AiChannel = aiChannel;
+            HumanChannel = new LocalNegotiationChannel();
+            AiChannel = new LocalNegotiationChannel();
             HumanConfig = humanConfig;
             AiConfig = aiConfig;
 
@@ -32,8 +31,8 @@ namespace Negotiation.Models
 
             Actions = new List<NegotiationActionModel>();
 
-            RegisterChannel(humanChannel);
-            RegisterChannel(aiChannel);
+            RegisterChannel(HumanChannel);
+            RegisterChannel(AiChannel);
         }
 
         private NegotiationOffer EmptyOffer()
@@ -44,14 +43,14 @@ namespace Negotiation.Models
             };
         }
 
-        private void RegisterChannel(INegotiationChannel channel)
+        private void RegisterChannel(INegotiationServer channel)
         {
             channel.NewOfferEvent += channel_NewOfferEvent;
             channel.OfferAcceptedEvent += channel_OfferAcceptedEvent;
             channel.OptOutEvent += channel_OptOutEvent;
         }
 
-        private void UnregisterChannel(INegotiationChannel channel)
+        private void UnregisterChannel(INegotiationServer channel)
         {
             channel.NewOfferEvent -= channel_NewOfferEvent;
             channel.OfferAcceptedEvent -= channel_OfferAcceptedEvent;
@@ -60,6 +59,8 @@ namespace Negotiation.Models
 
         void channel_OptOutEvent(object sender, EventArgs e)
         {
+            Status.State = sender == AiChannel ? NegotiationState.EndAiOptOut : NegotiationState.EndHumanOptOut;
+
             EndNegotiation();
 
             Status.HumanOffer.Score = CalculateOptoutScore(HumanConfig);
@@ -72,14 +73,29 @@ namespace Negotiation.Models
             return variant.Optout + variant.TimeEffect * Domain.RoundsPassed(Status.RemainingTime);
         }
 
-        void channel_OfferAcceptedEvent(object sender, EventArgs e)
+        INegotiationChannel GetOtherChannel(INegotiationChannel channel)
         {
-            throw new NotImplementedException();
+            return (channel == AiChannel ? HumanChannel : AiChannel);
         }
 
-        void channel_NewOfferEvent(object sender, NewOfferEventArgs e)
+        void channel_OfferAcceptedEvent(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Status.State = sender == AiChannel ? NegotiationState.EndHumanOfferAccepted : NegotiationState.EndAiOfferAccepted;
+
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                GetOtherChannel((INegotiationChannel)sender).OpponentAcceptedOffer();
+            });
+
+            EndNegotiation();
+        }
+
+        void channel_NewOfferEvent(object sender, OfferEventArgs e)
+        {
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                GetOtherChannel((INegotiationChannel)sender).OpponentOfferReceived(e.Offer);
+            });
         }
 
         public NegotiationDomain Domain { get; private set; }
@@ -95,7 +111,7 @@ namespace Negotiation.Models
 
         public void BeginNegotiation()
         {
-            _timer = new Timer()
+            _timer = new System.Timers.Timer()
             {
                 AutoReset = true,
                 Interval = 1000
@@ -106,6 +122,9 @@ namespace Negotiation.Models
             _timer.Enabled = true;
 
             NegotiationActive = true;
+
+            HumanChannel.NegotiationStarted();
+            AiChannel.NegotiationStarted();
         }
 
         private void EndNegotiation()
@@ -119,7 +138,13 @@ namespace Negotiation.Models
 
         void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            this.Status.RemainingTime -= TimeSpan.FromSeconds(1);
+            Status.RemainingTime -= TimeSpan.FromSeconds(1);
+
+            if (Status.RemainingTime.TotalSeconds == 0)
+            {
+                Status.State = NegotiationState.EndTimeout;
+                EndNegotiation();
+            }
         }
     }
 }

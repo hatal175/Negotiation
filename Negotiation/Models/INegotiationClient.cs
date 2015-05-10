@@ -13,5 +13,9 @@ namespace Negotiation.Models
         void AcceptOffer();
 
         event EventHandler NegotiationStartedEvent;
+        event EventHandler<OfferEventArgs> OfferReceivedEvent;
+        event EventHandler OpponentAcceptedOfferEvent;
+        event EventHandler OpponentOptOutReceivedEvent;
+        event EventHandler TimeOutEvent;
     }
 }

@@ -49,8 +49,6 @@ namespace Negotiation.Controllers
             NegotiationEngine engine = 
                 new NegotiationEngine(
                     NegotiationManager.Domain, 
-                    new LocalNegotiationChannel(),
-                    new LocalNegotiationChannel(), 
                     NegotiationManager.GetHumanConfig(), 
                     NegotiationManager.GetAiConfig());
 
@@ -125,10 +123,11 @@ namespace Negotiation.Controllers
 
         public ActionResult SubmitTutorialAnswers(NegotiationTutorialModel model)
         {
-            if (model == null)
+            if (model == null || model.TutorialId == null)
             {
                 return RedirectToAction("Negotiation");
             }
+
             //if (!model.Questions.Select(x => x.Answer).SequenceEqual(NegotiationManager.TutorialModels[model.TutorialId].Questions.Select(x => x.ActualAnswer)))
             //{
             //    return View("NegotiationTutorial", NegotiationManager.TutorialModels[model.TutorialId]);
@@ -157,23 +156,52 @@ namespace Negotiation.Controllers
 
         public ActionResult Negotiation(NegotiationViewModel model)
         {
+            if (model == null || model.Id == null) return RedirectToAction("Index");
+
+            NegotiationEngine engine;
+            if (model.Id == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(model.Id, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            if (!engine.NegotiationActive)
+            {
+                return View("NegotiationEndView",
+                new NegotiationEndModel()
+                {
+                    Score = engine.Status.HumanOffer.Score,
+                    Message = "You opted out."
+                });
+            }
+
             return View(model);
         }
 
         [HttpPost]
         public ActionResult SendOffer(String negotiationId, NegotiationOffer offer)
         {
-            NegotiationManager.OnGoingNegotiations[negotiationId].HumanChannel.SendOffer(offer);
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
 
-            return new HttpStatusCodeResult(System.Net.HttpStatusCode.Accepted);
+            engine.HumanChannel.SendOffer(offer);
+
+            return new EmptyResult();
         }
 
         [HttpPost]
         public ActionResult AcceptOffer(String negotiationId)
         {
-            NegotiationManager.OnGoingNegotiations[negotiationId].HumanChannel.AcceptOffer();
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
 
-            return new HttpStatusCodeResult(System.Net.HttpStatusCode.Accepted);
+            engine.HumanChannel.AcceptOffer();
+
+            return View("NegotiationEndView",
+                new NegotiationEndModel()
+                {
+                    Score = engine.Status.HumanOffer.Score,
+                    Message = "You accepted your opoonent's offer."
+                });
         }
 
         public ActionResult UpdateOpponentOffer(String negotiationId)
@@ -196,11 +224,15 @@ namespace Negotiation.Controllers
 
         public ActionResult OptOut(String negotiationId)
         {
-            NegotiationManager.OnGoingNegotiations[negotiationId].HumanChannel.OptOut();
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            engine.HumanChannel.OptOut();
             return View("NegotiationEndView",
                 new NegotiationEndModel()
                 {
-                    Score = NegotiationManager.OnGoingNegotiations[negotiationId].Status.HumanOffer.Score,
+                    Score = engine.Status.HumanOffer.Score,
                     Message = "You opted out."
                 });
         }

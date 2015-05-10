@@ -11,7 +11,7 @@ namespace Negotiation.Models
         {
             if (NewOfferEvent != null)
             {
-                NewOfferEvent(this, new NewOfferEventArgs(offer));
+                NewOfferEvent(this, new OfferEventArgs(offer));
             }
         }
 
@@ -23,7 +23,7 @@ namespace Negotiation.Models
             }
         }
 
-        public event EventHandler<NewOfferEventArgs> NewOfferEvent;
+        public event EventHandler<OfferEventArgs> NewOfferEvent;
 
         public event EventHandler OfferAcceptedEvent;
 
@@ -35,18 +35,55 @@ namespace Negotiation.Models
             }
         }
 
-
         public event EventHandler OptOutEvent;
 
-
         public event EventHandler NegotiationStartedEvent;
-
 
         public void NegotiationStarted()
         {
             if (NegotiationStartedEvent != null)
             {
                 NegotiationStartedEvent(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler<OfferEventArgs> OfferReceivedEvent;
+
+        public void OpponentOfferReceived(NegotiationOffer offer)
+        {
+            if (OfferReceivedEvent != null)
+            {
+                OfferReceivedEvent(this, new OfferEventArgs(offer));
+            }
+        }
+
+        public event EventHandler OpponentAcceptedOfferEvent;
+
+        public void OpponentAcceptedOffer()
+        {
+            if (OpponentAcceptedOfferEvent != null)
+            {
+                OpponentAcceptedOfferEvent(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler OpponentOptOutReceivedEvent;
+
+        public void OpponentOptOutReceived()
+        {
+            if (OpponentOptOutReceivedEvent != null)
+            {
+                OpponentOptOutReceivedEvent(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler TimeOutEvent;
+
+        public void TimeOut()
+        {
+            if (TimeOutEvent != null)
+            {
+                TimeOutEvent(this, EventArgs.Empty);
             }
         }
     }
