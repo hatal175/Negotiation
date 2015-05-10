@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/18/2015 20:25:05
+-- Date Created: 05/10/2015 21:09:38
 -- Generated from EDMX file: C:\Users\Inbal\documents\visual studio 2013\Projects\Negotiation\Negotiation\Models\Negotiation.edmx
 -- --------------------------------------------------
 
@@ -44,6 +44,9 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_GameDomainConfigGameDomain]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[GameDomainConfigSet] DROP CONSTRAINT [FK_GameDomainConfigGameDomain];
 GO
+IF OBJECT_ID(N'[dbo].[FK_UserUserData]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[UserDataSet] DROP CONSTRAINT [FK_UserUserData];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -76,6 +79,9 @@ GO
 IF OBJECT_ID(N'[dbo].[GameDomainConfigSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[GameDomainConfigSet];
 GO
+IF OBJECT_ID(N'[dbo].[UserDataSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[UserDataSet];
+GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -87,32 +93,32 @@ CREATE TABLE [dbo].[NegotiationActionSet] (
     [Type] tinyint  NOT NULL,
     [RemainingTime] time  NOT NULL,
     [Value] nvarchar(max)  NOT NULL,
-    [GameId] int  NOT NULL,
-    [User_Id] int  NOT NULL
+    [GameId] nvarchar(255)  NOT NULL,
+    [UserId] nvarchar(255)  NOT NULL
 );
 GO
 
 -- Creating table 'UserSet'
 CREATE TABLE [dbo].[UserSet] (
-    [Id] int IDENTITY(1,1) NOT NULL,
-    [UserString] nvarchar(max)  NOT NULL,
+    [Id] nvarchar(255)  NOT NULL,
     [Type] tinyint  NOT NULL,
-    [UserRole_Id] int  NOT NULL,
-    [GameUser_User_Id] int  NOT NULL
+    [GameId] nvarchar(255)  NOT NULL,
+    [UserRole_Id] int  NOT NULL
 );
 GO
 
 -- Creating table 'UserRoleSet'
 CREATE TABLE [dbo].[UserRoleSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
-    [Description] nvarchar(max)  NOT NULL
+    [Description] nvarchar(max)  NOT NULL,
+    [Variant] nvarchar(max)  NOT NULL
 );
 GO
 
 -- Creating table 'GameSet'
 CREATE TABLE [dbo].[GameSet] (
-    [Id] int IDENTITY(1,1) NOT NULL,
-    [GameDomain_Id] int  NOT NULL
+    [Id] nvarchar(255)  NOT NULL,
+    [GameDomainId] int  NOT NULL
 );
 GO
 
@@ -127,7 +133,7 @@ GO
 -- Creating table 'UserResultSet'
 CREATE TABLE [dbo].[UserResultSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
-    [GameId] int  NOT NULL,
+    [GameId] nvarchar(255)  NOT NULL,
     [UserScore] int  NOT NULL
 );
 GO
@@ -136,7 +142,7 @@ GO
 CREATE TABLE [dbo].[StrategySet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [DllMd5Hash] nvarchar(max)  NOT NULL,
-    [UserStrategy_Strategy_Id] int  NOT NULL
+    [UserStrategy_Strategy_Id] nvarchar(255)  NOT NULL
 );
 GO
 
@@ -153,6 +159,21 @@ GO
 CREATE TABLE [dbo].[GameDomainConfigSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [GameDomain_Id] int  NOT NULL
+);
+GO
+
+-- Creating table 'UserDataSet'
+CREATE TABLE [dbo].[UserDataSet] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [Gender] tinyint  NOT NULL,
+    [AgeRange] tinyint  NOT NULL,
+    [Education] tinyint  NOT NULL,
+    [DegreeField] nvarchar(max)  NULL,
+    [Country] nvarchar(max)  NOT NULL,
+    [Name] nvarchar(max)  NOT NULL,
+    [StudentId] bigint  NOT NULL,
+    [University] nvarchar(max)  NOT NULL,
+    [UserUserData_UserData_Id] nvarchar(255)  NOT NULL
 );
 GO
 
@@ -214,14 +235,20 @@ ADD CONSTRAINT [PK_GameDomainConfigSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
+-- Creating primary key on [Id] in table 'UserDataSet'
+ALTER TABLE [dbo].[UserDataSet]
+ADD CONSTRAINT [PK_UserDataSet]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
 -- --------------------------------------------------
 -- Creating all FOREIGN KEY constraints
 -- --------------------------------------------------
 
--- Creating foreign key on [User_Id] in table 'NegotiationActionSet'
+-- Creating foreign key on [UserId] in table 'NegotiationActionSet'
 ALTER TABLE [dbo].[NegotiationActionSet]
 ADD CONSTRAINT [FK_NegotiationActionUserId]
-    FOREIGN KEY ([User_Id])
+    FOREIGN KEY ([UserId])
     REFERENCES [dbo].[UserSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -230,7 +257,7 @@ GO
 -- Creating non-clustered index for FOREIGN KEY 'FK_NegotiationActionUserId'
 CREATE INDEX [IX_FK_NegotiationActionUserId]
 ON [dbo].[NegotiationActionSet]
-    ([User_Id]);
+    ([UserId]);
 GO
 
 -- Creating foreign key on [UserRole_Id] in table 'UserSet'
@@ -248,10 +275,10 @@ ON [dbo].[UserSet]
     ([UserRole_Id]);
 GO
 
--- Creating foreign key on [GameUser_User_Id] in table 'UserSet'
+-- Creating foreign key on [GameId] in table 'UserSet'
 ALTER TABLE [dbo].[UserSet]
 ADD CONSTRAINT [FK_GameUser]
-    FOREIGN KEY ([GameUser_User_Id])
+    FOREIGN KEY ([GameId])
     REFERENCES [dbo].[GameSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -260,7 +287,7 @@ GO
 -- Creating non-clustered index for FOREIGN KEY 'FK_GameUser'
 CREATE INDEX [IX_FK_GameUser]
 ON [dbo].[UserSet]
-    ([GameUser_User_Id]);
+    ([GameId]);
 GO
 
 -- Creating foreign key on [GameId] in table 'NegotiationActionSet'
@@ -278,10 +305,10 @@ ON [dbo].[NegotiationActionSet]
     ([GameId]);
 GO
 
--- Creating foreign key on [GameDomain_Id] in table 'GameSet'
+-- Creating foreign key on [GameDomainId] in table 'GameSet'
 ALTER TABLE [dbo].[GameSet]
 ADD CONSTRAINT [FK_GameGameDomain]
-    FOREIGN KEY ([GameDomain_Id])
+    FOREIGN KEY ([GameDomainId])
     REFERENCES [dbo].[GameDomainSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -290,7 +317,7 @@ GO
 -- Creating non-clustered index for FOREIGN KEY 'FK_GameGameDomain'
 CREATE INDEX [IX_FK_GameGameDomain]
 ON [dbo].[GameSet]
-    ([GameDomain_Id]);
+    ([GameDomainId]);
 GO
 
 -- Creating foreign key on [GameId] in table 'UserResultSet'
@@ -351,6 +378,21 @@ GO
 CREATE INDEX [IX_FK_GameDomainConfigGameDomain]
 ON [dbo].[GameDomainConfigSet]
     ([GameDomain_Id]);
+GO
+
+-- Creating foreign key on [UserUserData_UserData_Id] in table 'UserDataSet'
+ALTER TABLE [dbo].[UserDataSet]
+ADD CONSTRAINT [FK_UserUserData]
+    FOREIGN KEY ([UserUserData_UserData_Id])
+    REFERENCES [dbo].[UserSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_UserUserData'
+CREATE INDEX [IX_FK_UserUserData]
+ON [dbo].[UserDataSet]
+    ([UserUserData_UserData_Id]);
 GO
 
 -- --------------------------------------------------

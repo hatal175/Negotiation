@@ -14,8 +14,8 @@
             <td>
                 @(topic.Key + ":")
             </td>
-            <td id='opOffer_@(topic.Key)'>
-                @topic.Value.TopicValue
+            <td id='opOffer_@(topic.Key.Replace(' ','_'))'>
+                @topic.Value
             </td>
         </tr>
     }

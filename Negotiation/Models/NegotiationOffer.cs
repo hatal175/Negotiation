@@ -9,11 +9,9 @@ namespace Negotiation.Models
     {
         public NegotiationOffer()
         {
-            Offers = new Dictionary<string, NegotiationTopicOffer>();
+            Offers = new Dictionary<string, string>();
         }
 
-        public Dictionary<String,NegotiationTopicOffer> Offers { get; set; }
-
-        public int Score { get; set; }
+        public Dictionary<String,String> Offers { get; set; }
     }
 }

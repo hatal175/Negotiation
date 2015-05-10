@@ -15,6 +15,7 @@
     <EntitySet Name="StrategySet" EntityType="Negotiation.Store.StrategySet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DomainVariantSet" EntityType="Negotiation.Store.DomainVariantSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="GameDomainConfigSet" EntityType="Negotiation.Store.GameDomainConfigSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="UserDataSet" EntityType="Negotiation.Store.UserDataSet" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="NegotiationActionUserId" Association="Negotiation.Store.NegotiationActionUserId">
       <End Role="NegotiationAction" EntitySet="NegotiationActionSet" />
       <End Role="UserId" EntitySet="UserSet" />
@@ -51,6 +52,10 @@
       <End Role="GameDomainConfig" EntitySet="GameDomainConfigSet" />
       <End Role="GameDomain" EntitySet="GameDomainSet" />
     </AssociationSet>
+    <AssociationSet Name="UserUserData" Association="Negotiation.Store.UserUserData">
+      <End Role="User" EntitySet="UserSet" />
+      <End Role="UserData" EntitySet="UserDataSet" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="NegotiationActionSet">
     <Key>
@@ -60,18 +65,17 @@
     <Property Name="Type" Type="tinyint" Nullable="false" />
     <Property Name="RemainingTime" Type="time" Nullable="false" />
     <Property Name="Value" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="GameId" Type="int" Nullable="false" />
-    <Property Name="User_Id" Type="int" Nullable="false" />
+    <Property Name="GameId" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="UserId" Type="nvarchar" Nullable="false" MaxLength="255" />
   </EntityType>
   <EntityType Name="UserSet">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="UserString" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Id" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="Type" Type="tinyint" Nullable="false" />
+    <Property Name="GameId" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="UserRole_Id" Type="int" Nullable="false" />
-    <Property Name="GameUser_User_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="UserRoleSet">
     <Key>
@@ -79,13 +83,14 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Variant" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="GameSet">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="GameDomain_Id" Type="int" Nullable="false" />
+    <Property Name="Id" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="GameDomainId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="GameDomainSet">
     <Key>
@@ -100,7 +105,7 @@
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="GameId" Type="int" Nullable="false" />
+    <Property Name="GameId" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="UserScore" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="StrategySet">
@@ -109,7 +114,7 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="DllMd5Hash" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="UserStrategy_Strategy_Id" Type="int" Nullable="false" />
+    <Property Name="UserStrategy_Strategy_Id" Type="nvarchar" MaxLength="255" Nullable="false" />
   </EntityType>
   <EntityType Name="DomainVariantSet">
     <Key>
@@ -127,6 +132,21 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="GameDomain_Id" Type="int" Nullable="false" />
   </EntityType>
+  <EntityType Name="UserDataSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Gender" Type="tinyint" Nullable="false" />
+    <Property Name="AgeRange" Type="tinyint" Nullable="false" />
+    <Property Name="Education" Type="tinyint" Nullable="false" />
+    <Property Name="DegreeField" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Country" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="StudentId" Type="bigint" Nullable="false" />
+    <Property Name="University" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="UserUserData_UserData_Id" Type="nvarchar" MaxLength="255" Nullable="false" />
+  </EntityType>
   <Association Name="NegotiationActionUserId">
     <End Role="NegotiationAction" Type="Negotiation.Store.NegotiationActionSet" Multiplicity="*" />
     <End Role="UserId" Type="Negotiation.Store.UserSet" Multiplicity="1" />
@@ -135,7 +155,7 @@
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="NegotiationAction">
-        <PropertyRef Name="User_Id" />
+        <PropertyRef Name="UserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -159,7 +179,7 @@
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="User">
-        <PropertyRef Name="GameUser_User_Id" />
+        <PropertyRef Name="GameId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -183,7 +203,7 @@
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="Game">
-        <PropertyRef Name="GameDomain_Id" />
+        <PropertyRef Name="GameDomainId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -232,6 +252,18 @@
       </Principal>
       <Dependent Role="GameDomainConfig">
         <PropertyRef Name="GameDomain_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserUserData">
+    <End Role="User" Type="Negotiation.Store.UserSet" Multiplicity="1" />
+    <End Role="UserData" Type="Negotiation.Store.UserDataSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="UserData">
+        <PropertyRef Name="UserUserData_UserData_Id" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -285,6 +317,11 @@
             <End Role="GameDomainConfig" EntitySet="GameDomainConfigSet" />
             <End Role="GameDomain" EntitySet="GameDomainSet" />
           </AssociationSet>
+          <EntitySet Name="UserDataSet" EntityType="Negotiation.UserData" />
+          <AssociationSet Name="UserUserData" Association="Negotiation.UserUserData">
+            <End EntitySet="UserSet" Role="User" />
+            <End EntitySet="UserDataSet" Role="UserData" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="NegotiationAction">
           <Key>
@@ -295,7 +332,8 @@
           <Property Name="RemainingTime" Type="Time" Nullable="false" />
           <NavigationProperty Name="User" Relationship="Negotiation.NegotiationActionUserId" FromRole="NegotiationAction" ToRole="UserId" />
           <Property Name="Value" Type="String" Nullable="false" />
-          <Property Name="GameId" Type="Int32" Nullable="false" />
+          <Property Name="GameId" Type="String" Nullable="false" MaxLength="255" />
+          <Property Name="UserId" Type="String" Nullable="false" MaxLength="255" />
         </EntityType>
         <EnumType Name="NegotiationActionType" UnderlyingType="Byte">
           <Member Name="Connect" />
@@ -310,15 +348,24 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserString" Type="String" Nullable="false" />
+          <Property Name="Id" Type="String" Nullable="false" annotation:StoreGeneratedPattern="None" MaxLength="255" />
           <NavigationProperty Name="UserRole" Relationship="Negotiation.UserUserRole" FromRole="User" ToRole="UserRole" />
           <Property Name="Type" Type="Negotiation.UserType" Nullable="false" />
           <NavigationProperty Name="Strategy" Relationship="Negotiation.UserStrategy" FromRole="User" ToRole="Strategy" />
+          <NavigationProperty Name="UserData" Relationship="Negotiation.UserUserData" FromRole="User" ToRole="UserData" />
+          <Property Name="GameId" Type="String" Nullable="false" MaxLength="255" />
         </EntityType>
         <Association Name="NegotiationActionUserId">
-          <End Type="Negotiation.NegotiationAction" Role="NegotiationAction" Multiplicity="1" />
+          <End Type="Negotiation.NegotiationAction" Role="NegotiationAction" Multiplicity="*" />
           <End Type="Negotiation.User" Role="UserId" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="UserId">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NegotiationAction">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <EntityType Name="UserRole">
           <Key>
@@ -326,6 +373,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Description" Type="String" Nullable="false" />
+          <Property Name="Variant" Type="String" Nullable="false" />
         </EntityType>
         <Association Name="UserUserRole">
           <End Type="Negotiation.User" Role="User" Multiplicity="1" />
@@ -335,15 +383,24 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Type="String" Nullable="false" annotation:StoreGeneratedPattern="None" MaxLength="255" />
           <NavigationProperty Name="Users" Relationship="Negotiation.GameUser" FromRole="Game" ToRole="User" />
-          <NavigationProperty Name="NegotiationAction" Relationship="Negotiation.GameNegotiationAction" FromRole="Game" ToRole="NegotiationAction" />
+          <NavigationProperty Name="NegotiationActions" Relationship="Negotiation.GameNegotiationAction" FromRole="Game" ToRole="NegotiationAction" />
           <NavigationProperty Name="GameDomain" Relationship="Negotiation.GameGameDomain" FromRole="Game" ToRole="GameDomain" />
           <NavigationProperty Name="UserResult" Relationship="Negotiation.GameUserResult" FromRole="Game" ToRole="UserResult" />
+          <Property Name="GameDomainId" Type="Int32" Nullable="false" />
         </EntityType>
         <Association Name="GameUser">
           <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
           <End Type="Negotiation.User" Role="User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Game">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="GameId" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <Association Name="GameNegotiationAction">
           <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
@@ -367,15 +424,23 @@
           <Property Name="Name" Type="String" Nullable="false" />
         </EntityType>
         <Association Name="GameGameDomain">
-          <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
+          <End Type="Negotiation.Game" Role="Game" Multiplicity="*" />
           <End Type="Negotiation.GameDomain" Role="GameDomain" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="GameDomain">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Game">
+              <PropertyRef Name="GameDomainId" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <EntityType Name="UserResult">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="GameId" Type="Int32" Nullable="false" />
+          <Property Name="GameId" Type="String" Nullable="false" MaxLength="255" />
           <Property Name="UserScore" Type="Int32" Nullable="false" />
         </EntityType>
         <Association Name="GameUserResult">
@@ -437,6 +502,39 @@
           <End Type="Negotiation.GameDomainConfig" Role="GameDomainConfig" Multiplicity="1" />
           <End Type="Negotiation.GameDomain" Role="GameDomain" Multiplicity="1" />
         </Association>
+        <EntityType Name="UserData">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Gender" Type="Negotiation.Gender" Nullable="false" />
+          <Property Name="AgeRange" Type="Negotiation.AgeRange" Nullable="false" />
+          <Property Name="Education" Type="Negotiation.Education" Nullable="false" />
+          <Property Name="DegreeField" Type="String" Nullable="true" />
+          <Property Name="Country" Type="String" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="StudentId" Type="Int64" Nullable="false" />
+          <Property Name="University" Type="String" Nullable="false" />
+        </EntityType>
+        <EnumType Name="Gender" UnderlyingType="Byte">
+          <Member Name="Male" />
+          <Member Name="Female" />
+        </EnumType>
+        <EnumType Name="AgeRange" UnderlyingType="Byte">
+          <Member Name="FifteenToTwenty" />
+          <Member Name="TwentyOneToThirty" />
+          <Member Name="ThirtyOnePlus" />
+        </EnumType>
+        <EnumType Name="Education" UnderlyingType="Byte">
+          <Member Name="TwelveYears" />
+          <Member Name="Bachelor" />
+          <Member Name="Masters" />
+          <Member Name="Phd" />
+        </EnumType>
+        <Association Name="UserUserData">
+          <End Type="Negotiation.User" Multiplicity="1" Role="User" />
+          <End Type="Negotiation.UserData" Multiplicity="0..1" Role="UserData" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -451,6 +549,7 @@
           <ScalarProperty Name="RemainingTime" ColumnName="RemainingTime" />
           <ScalarProperty Name="Value" ColumnName="Value" />
           <ScalarProperty Name="GameId" ColumnName="GameId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -458,8 +557,8 @@
       <EntityTypeMapping TypeName="IsTypeOf(Negotiation.User)">
         <MappingFragment StoreEntitySet="UserSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="UserString" ColumnName="UserString" />
           <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="GameId" ColumnName="GameId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -468,6 +567,7 @@
         <MappingFragment StoreEntitySet="UserRoleSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="Variant" ColumnName="Variant" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -475,6 +575,7 @@
       <EntityTypeMapping TypeName="IsTypeOf(Negotiation.Game)">
         <MappingFragment StoreEntitySet="GameSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="GameDomainId" ColumnName="GameDomainId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -521,35 +622,26 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <AssociationSetMapping Name="NegotiationActionUserId" TypeName="Negotiation.NegotiationActionUserId" StoreEntitySet="NegotiationActionSet">
-      <EndProperty Name="UserId">
-        <ScalarProperty Name="Id" ColumnName="User_Id" />
-      </EndProperty>
-      <EndProperty Name="NegotiationAction">
-        <ScalarProperty Name="Id" ColumnName="Id" />
-      </EndProperty>
-    </AssociationSetMapping>
+    <EntitySetMapping Name="UserDataSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.UserData)">
+        <MappingFragment StoreEntitySet="UserDataSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="AgeRange" ColumnName="AgeRange" />
+          <ScalarProperty Name="Education" ColumnName="Education" />
+          <ScalarProperty Name="DegreeField" ColumnName="DegreeField" />
+          <ScalarProperty Name="Country" ColumnName="Country" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+          <ScalarProperty Name="University" ColumnName="University" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="UserUserRole" TypeName="Negotiation.UserUserRole" StoreEntitySet="UserSet">
       <EndProperty Name="UserRole">
         <ScalarProperty Name="Id" ColumnName="UserRole_Id" />
       </EndProperty>
       <EndProperty Name="User">
-        <ScalarProperty Name="Id" ColumnName="Id" />
-      </EndProperty>
-    </AssociationSetMapping>
-    <AssociationSetMapping Name="GameUser" TypeName="Negotiation.GameUser" StoreEntitySet="UserSet">
-      <EndProperty Name="Game">
-        <ScalarProperty Name="Id" ColumnName="GameUser_User_Id" />
-      </EndProperty>
-      <EndProperty Name="User">
-        <ScalarProperty Name="Id" ColumnName="Id" />
-      </EndProperty>
-    </AssociationSetMapping>
-    <AssociationSetMapping Name="GameGameDomain" TypeName="Negotiation.GameGameDomain" StoreEntitySet="GameSet">
-      <EndProperty Name="GameDomain">
-        <ScalarProperty Name="Id" ColumnName="GameDomain_Id" />
-      </EndProperty>
-      <EndProperty Name="Game">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
@@ -566,6 +658,14 @@
         <ScalarProperty Name="Id" ColumnName="GameDomain_Id" />
       </EndProperty>
       <EndProperty Name="GameDomainConfig">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="UserUserData" TypeName="Negotiation.UserUserData" StoreEntitySet="UserDataSet">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="UserUserData_UserData_Id" />
+      </EndProperty>
+      <EndProperty Name="UserData">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
@@ -589,7 +689,7 @@
     </edmx:Options>
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="4a1ab34b337e43ccbc5b0b8b788ac68b" Name="Diagram1">
+      <Diagram DiagramId="4a1ab34b337e43ccbc5b0b8b788ac68b" Name="Diagram1" ZoomLevel="77">
         <EntityTypeShape EntityType="Negotiation.NegotiationAction" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
         <EntityTypeShape EntityType="Negotiation.User" Width="1.5" PointX="5.25" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Negotiation.UserRole" Width="1.5" PointX="7.5" PointY="3.875" IsExpanded="true" />
@@ -608,6 +708,8 @@
         <AssociationConnector Association="Negotiation.GameDomainDomainVariant" />
         <EntityTypeShape EntityType="Negotiation.GameDomainConfig" Width="1.5" PointX="3.375" PointY="8.75" />
         <AssociationConnector Association="Negotiation.GameDomainConfigGameDomain" />
+        <EntityTypeShape EntityType="Negotiation.UserData" Width="1.5" PointX="10.125" PointY="5.25" />
+        <AssociationConnector Association="Negotiation.UserUserData" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

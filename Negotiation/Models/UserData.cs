@@ -12,10 +12,16 @@ namespace Negotiation.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class UserResult
+    public partial class UserData
     {
         public int Id { get; set; }
-        public string GameId { get; set; }
-        public int UserScore { get; set; }
+        public Gender Gender { get; set; }
+        public AgeRange AgeRange { get; set; }
+        public Education Education { get; set; }
+        public string DegreeField { get; set; }
+        public string Country { get; set; }
+        public string Name { get; set; }
+        public long StudentId { get; set; }
+        public string University { get; set; }
     }
 }

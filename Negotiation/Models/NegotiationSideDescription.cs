@@ -12,7 +12,6 @@ namespace Negotiation.Models
         public int Reservation { get; set; }
         public int Optout { get; set; }
         public int TimeEffect { get; set; }
-        public int StatusQuoScore { get; set; }
 
         public override void Extract(System.Xml.XmlNode node)
         {

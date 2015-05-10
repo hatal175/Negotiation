@@ -14,11 +14,12 @@ namespace Negotiation.Models
     
     public partial class User
     {
-        public int Id { get; set; }
-        public string UserString { get; set; }
+        public string Id { get; set; }
         public UserType Type { get; set; }
+        public string GameId { get; set; }
     
         public virtual UserRole UserRole { get; set; }
         public virtual Strategy Strategy { get; set; }
+        public virtual UserData UserData { get; set; }
     }
 }

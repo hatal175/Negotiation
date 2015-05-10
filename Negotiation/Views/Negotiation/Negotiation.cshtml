@@ -85,8 +85,8 @@
                                                 @(topic.Key + ":")
                                             </td>
                                             <td>
-                                                <select name="@Html.Name("offer.Offers[" + topic.Key + "].TopicValue")"
-                                                        id=@("Offer_" + topic.Key)
+                                                <select name="@Html.Name("offer.Offers[" + topic.Key + "]")"
+                                                        id=@("Offer_" + topic.Key.Replace(' ','_'))
                                                         onchange="recheckOffer()"
                                                         data_id="Offer">
                                                     @foreach (var option in topic.Value.Options.Values)
@@ -105,7 +105,7 @@
                                             <b>Your Score:</b>
                                         </td>
                                         <td id="yourScore">
-                                            @(Model.Offer.Offers.Values.Sum(x => int.Parse(x.TopicValue)) + Model.Domain.RoundsPassed(Model.RemainingTime) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
+                                            @(Model.Offer.Offers.Values.Sum(x => int.Parse(x)) + Model.Domain.RoundsPassed(Model.RemainingTime) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
                                         </td>
                                     </tr>
                                 </table>
@@ -127,9 +127,9 @@
                                             <td>
                                                 @(topic.Key + ":")
                                             </td>
-                                            <td id='opOffer_@(topic.Key)'>
+                                            <td id='opOffer_@(topic.Key.Replace(' ','_'))'>
                                                 @{
-                                        Negotiation.Models.NegotiationTopicOffer value;
+                                        string value;
                                         var x = Model.OpponentOffer.Offers.TryGetValue(topic.Key, out value);
                                         if (x)
                                         {@value}
@@ -249,20 +249,20 @@
         scorePerRound = @Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect;
         
         negotiationTimer = document.getElementById("negotiationTimerText");
-        timeText = negotiationTimer.innerText;
+        timeText = negotiationTimer.innerHTML.trim();
         timeArr = timeText.split(":");
-        timeLeft = TimeSpan(timeArr[0],timeArr[1],timeArr[2]).TotalSeconds();
+        timeLeft = new TimeSpan(parseInt(timeArr[0]),parseInt(timeArr[1]),parseInt(timeArr[2])).totalSeconds();
 
         totalTime = @(Model.Domain.RoundLength.TotalSeconds * Model.Domain.NumberOfRounds);
 
-        return Math.floor((totalTime - timeLeft) / @Model.Domain.RoundLength.TotalSeconds);
+        return scorePerRound * Math.floor((totalTime - timeLeft) / @Model.Domain.RoundLength.TotalSeconds);
     };
 
     recheckOffer = function () {
 
         scoreSum = 0;
 
-        $('[data-id="Offer"]').each(function(index,offer) {
+        $('[data_id="Offer"]').each(function(index,offer) {
             var offer_id = offer["id"];
             var op_offer = document.getElementById('op'+offer_id);
 
@@ -279,11 +279,11 @@
                     offer.style.backgroundColor = "LightGreen";
                 }
             }
-
-            scoreSum += offer.options[offer.selectedIndex]["data-score"];
+            console.log("ssss" + scoreSum);
+            scoreSum += parseInt(offer.options[offer.selectedIndex].getAttribute("data-score"));
         });
 
-        document.getElementById("yourScore").text = scoreSum;
+        document.getElementById("yourScore").innerHTML = scoreSum + getTimeScore();
     };
 
     recheckOffer();

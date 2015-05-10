@@ -7,38 +7,67 @@ using System.Web;
 
 namespace Negotiation.Models
 {
-    public enum Gender
+    //public enum AgeRange
+    //{
+    //    [Description("15-20")]
+    //    FifteenToTwenty,
+
+    //    [Description("21-30")]
+    //    TwentyOneToThirty,
+
+    //    [Description("31+")]
+    //    ThirtyPlus
+    //}
+
+    public static class PreNegotiationQuestionnaireUtils
     {
-        Male,
-        Female
-    }
+        public static String Description(this AgeRange ageRange)
+        {
+            switch (ageRange)
+            {
+                case AgeRange.FifteenToTwenty:
+                    return "15-20";
+                case AgeRange.TwentyOneToThirty:
+                    return "21-30";
+                case AgeRange.ThirtyOnePlus:
+                    return "31+";
+                default:
+                    return "No Description";
+            }
+        }
 
-    public enum AgeRange
-    {
-        [Description("15-20")]
-        FifteenToTwenty,
-
-        [Description("21-30")]
-        TwentyOneToThirty,
-
-        [Description("31+")]
-        ThirtyPlus
+        public static String Description(this Education education)
+        {
+            switch (education)
+            {
+                case Education.TwelveYears:
+                    return "High School Education";
+                case Education.Bachelor:
+                    return "Bachelor Degree";
+                case Education.Masters:
+                    return "Masters Degree";
+                case Education.Phd:
+                    return "Phd";
+                default:
+                    return "No Description";
+            }
+        }
     }
     
-    public enum Education
-    {
-        [Description("High School Education")]
-        TwelveYears,
+    //public enum Education
+    //{
+    //    [Description("High School Education")]
+    //    TwelveYears,
 
-        [Description("Bachelor Degree")]
-        Bachelor,
+    //    [Description("Bachelor Degree")]
+    //    Bachelor,
 
-        [Description("Masters Degree")]
-        Masters,
+    //    [Description("Masters Degree")]
+    //    Masters,
 
-        [Description("Phd")]
-        Phd
-    }
+    //    [Description("Phd")]
+    //    Phd
+    //}
 
     public class PreNegotiationQuestionnaireViewModel
     {

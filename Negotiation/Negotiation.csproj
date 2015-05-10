@@ -171,10 +171,17 @@
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AgentNegotiator.cs" />
+    <Compile Include="Models\AgeRange.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\BaseNegotiator.cs" />
     <Compile Include="Models\DomainVariant.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Education.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EnumUtils.cs" />
     <Compile Include="Models\Game.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
@@ -182,6 +189,9 @@
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GameDomainConfig.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Gender.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\IXmlExtractable.cs" />
@@ -205,7 +215,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Negotiation.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\NegotiationAction.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\NegotiationActionModel.cs" />
+    <Compile Include="Models\NegotiationActionType.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\NegotiationConfigurationModel.cs" />
     <Compile Include="Models\NegotiationEndModel.cs" />
     <Compile Include="Models\NegotiationManager.cs" />
@@ -218,12 +234,6 @@
     <Compile Include="Models\INegotiationServer.cs" />
     <Compile Include="Models\LocalNegotiationChannel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\NegotiationAction.cs">
-      <DependentUpon>Negotiation.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\NegotiationActionType.cs">
-      <DependentUpon>Negotiation.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\NegotiationDescription.cs" />
     <Compile Include="Models\NegotiationEngine.cs" />
     <Compile Include="Models\NegotiationDomain.cs" />
@@ -241,6 +251,9 @@
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\User.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserData.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\UserResult.cs">

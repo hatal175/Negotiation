@@ -10,12 +10,12 @@
 namespace Negotiation.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class UserResult
+    public enum Education : byte
     {
-        public int Id { get; set; }
-        public string GameId { get; set; }
-        public int UserScore { get; set; }
+        TwelveYears = 0,
+        Bachelor = 1,
+        Masters = 2,
+        Phd = 3
     }
 }

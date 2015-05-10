@@ -18,7 +18,8 @@ namespace Negotiation.Models
         public NegotiationActionType Type { get; set; }
         public System.TimeSpan RemainingTime { get; set; }
         public string Value { get; set; }
-        public int GameId { get; set; }
+        public string GameId { get; set; }
+        public string UserId { get; set; }
     
         public virtual User User { get; set; }
     }

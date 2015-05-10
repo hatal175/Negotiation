@@ -7,7 +7,6 @@ namespace Negotiation.Models
 {
     public class NegotiationTopicOffer
     {
-        public String TopicName { get; set; }
-        public String TopicValue { get; set; }
+        public String Value { get; set; }
     }
 }

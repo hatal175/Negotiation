@@ -31,11 +31,10 @@
             <td class="tablecelltitle">Age Range:</td>
             <td class="tablecellcontent">
                 @Html.DropDownListFor(m => m.AgeRange,
-            Enum.GetNames(typeof(Negotiation.Models.AgeRange)).Select(x => new SelectListItem
+                Enum.GetValues(typeof(Negotiation.Models.AgeRange)).Cast<Negotiation.Models.AgeRange>().Select(x => new SelectListItem
             {
-                Value = x,
-                Text = ((System.ComponentModel.DescriptionAttribute)Attribute.GetCustomAttributes(typeof(Negotiation.Models.AgeRange).GetField(x),
-                        typeof(System.ComponentModel.DescriptionAttribute))[0]).Description
+                Value = x.ToString(),
+                Text = Negotiation.Models.PreNegotiationQuestionnaireUtils.Description(x)
             }), "--select--")
             </td>
         </tr>
@@ -43,11 +42,10 @@
             <td class="tablecelltitle">Education:</td>
             <td class="tablecellcontent">
                 @Html.DropDownListFor(m => m.Education,
-                     Enum.GetNames(typeof(Negotiation.Models.Education)).Select(x => new SelectListItem
+                     Enum.GetValues(typeof(Negotiation.Models.Education)).Cast<Negotiation.Models.Education>().Select(x => new SelectListItem
             {
-                Value = x,
-                Text = ((System.ComponentModel.DescriptionAttribute)Attribute.GetCustomAttributes(typeof(Negotiation.Models.Education).GetField(x),
-                        typeof(System.ComponentModel.DescriptionAttribute))[0]).Description
+                Value = x.ToString(),
+                Text = Negotiation.Models.PreNegotiationQuestionnaireUtils.Description(x) 
             }), "--select--")
             </td>
         </tr>

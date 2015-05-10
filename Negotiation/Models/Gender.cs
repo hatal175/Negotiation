@@ -10,12 +10,10 @@
 namespace Negotiation.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class UserResult
+    public enum Gender : byte
     {
-        public int Id { get; set; }
-        public string GameId { get; set; }
-        public int UserScore { get; set; }
+        Male = 0,
+        Female = 1
     }
 }

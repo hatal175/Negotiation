@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Timers;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace Negotiation.Models
 {
@@ -12,7 +13,9 @@ namespace Negotiation.Models
     {
         private System.Timers.Timer _timer;
 
-        public NegotiationEngine(NegotiationDomain domain, 
+        public NegotiationEngine(
+            String negotiationId,
+            NegotiationDomain domain, 
             SideConfig humanConfig,
             SideConfig aiConfig)
         {
@@ -25,8 +28,8 @@ namespace Negotiation.Models
             Status = new NegotiationStatus()
             {
                 RemainingTime = TimeSpan.FromSeconds(domain.NumberOfRounds * domain.RoundLength.TotalSeconds),
-                HumanOffer = EmptyOffer(),
-                AiOffer = EmptyOffer()
+                HumanStatus = new SideStatus() { Offer = EmptyOffer() },
+                AiStatus = new SideStatus() { Offer = EmptyOffer() },
             };
 
             Actions = new List<NegotiationActionModel>();
@@ -39,7 +42,16 @@ namespace Negotiation.Models
         {
             return new NegotiationOffer()
             {
-                Offers = Domain.Options.Topics.Keys.ToDictionary(x => x, x => new NegotiationTopicOffer() {TopicName=x,TopicValue="---" })
+                Offers = Domain.Options.Topics.Keys.ToDictionary(x => x, x=>"---")
+            };
+        }
+
+        public NegotiationEndModel GetEndModel()
+        {
+            return new NegotiationEndModel()
+            {
+                Score = Status.HumanStatus.Score,
+                Message = Status.State.GetEnumDescription()
             };
         }
 
@@ -63,8 +75,16 @@ namespace Negotiation.Models
 
             EndNegotiation();
 
-            Status.HumanOffer.Score = CalculateOptoutScore(HumanConfig);
-            Status.AiOffer.Score = CalculateOptoutScore(AiConfig);
+            Status.HumanStatus.Score = CalculateOptoutScore(HumanConfig);
+            Status.AiStatus.Score = CalculateOptoutScore(AiConfig);
+
+            this.Actions.Add(new NegotiationActionModel()
+            {
+                Role = (((INegotiationChannel)sender) == AiChannel) ? AiConfig.Side : HumanConfig.Side,
+                Type = NegotiationActionType.Optout,
+            });
+
+            NegotiationManager.SaveOptOut(this, sender == AiChannel ? AiConfig : HumanConfig);
         }
 
         int CalculateOptoutScore(SideConfig config)
@@ -87,17 +107,38 @@ namespace Negotiation.Models
                 GetOtherChannel((INegotiationChannel)sender).OpponentAcceptedOffer();
             });
 
+            this.Actions.Add(new NegotiationActionModel()
+            {
+                Role = (((INegotiationChannel)sender) == AiChannel) ? AiConfig.Side : HumanConfig.Side,
+                Type = NegotiationActionType.AcceptOffer
+            });
+
             EndNegotiation();
         }
 
         void channel_NewOfferEvent(object sender, OfferEventArgs e)
         {
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            string offer = js.Serialize(e.Offer);
+
+            SideConfig side = (((INegotiationChannel)sender) == AiChannel) ? AiConfig : HumanConfig;
+
+            this.Actions.Add(new NegotiationActionModel()
+                {
+                    Role = side.Side,
+                    Type = NegotiationActionType.MakeOffer,
+                    Value = offer
+                });
+
+            NegotiationManager.SaveNewOffer(this, side, offer);
+
             ThreadPool.QueueUserWorkItem(x =>
             {
                 GetOtherChannel((INegotiationChannel)sender).OpponentOfferReceived(e.Offer);
             });
         }
 
+        public String NegotiationId { get; set; }
         public NegotiationDomain Domain { get; private set; }
         public SideConfig HumanConfig { get; set; }
         public SideConfig AiConfig { get; set; }

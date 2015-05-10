@@ -10,12 +10,11 @@
 namespace Negotiation.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class UserResult
+    public enum AgeRange : byte
     {
-        public int Id { get; set; }
-        public string GameId { get; set; }
-        public int UserScore { get; set; }
+        FifteenToTwenty = 0,
+        TwentyOneToThirty = 1,
+        ThirtyOnePlus = 2
     }
 }

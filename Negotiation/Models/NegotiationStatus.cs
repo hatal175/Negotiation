@@ -5,10 +5,16 @@ using System.Web;
 
 namespace Negotiation.Models
 {
+    public class SideStatus
+    {
+        public NegotiationOffer Offer { get; set; }
+        public int Score { get; set; }
+    }
+
     public class NegotiationStatus
     {
-        public NegotiationOffer HumanOffer { get; set; }
-        public NegotiationOffer AiOffer { get; set; }
+        public SideStatus HumanStatus { get; set; }
+        public SideStatus AiStatus { get; set; }
         public TimeSpan RemainingTime { get; set; }
         public NegotiationState State {get; set;}
     }

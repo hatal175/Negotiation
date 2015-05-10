@@ -12,6 +12,7 @@ namespace Negotiation.Models
     {
         public String Side { get; set; }
         public String Variant { get; set; }
+        public UserType Type { get; set; }
     }
 
     public class NegotiationManager
@@ -36,9 +37,7 @@ namespace Negotiation.Models
 
         static void LoadDbData()
         {
-            NegotiationContainer cont = new NegotiationContainer();
-
-            GameDomain = cont.GameDomainConfigSet.First().GameDomain;
+            GameDomain = new NegotiationContainer().GameDomainConfigSet.First().GameDomain;
 
             Domain = new NegotiationDomain() {RoundLength = RoundLength, NumberOfRounds = TotalRounds };
             XmlDocument doc = new XmlDocument();
@@ -50,7 +49,6 @@ namespace Negotiation.Models
         static void SetActiveDomain(String domainName)
         {
             NegotiationContainer cont = new NegotiationContainer();
-
             GameDomain domain = cont.GameDomainSet.First(x => x.Name == domainName);
             cont.GameDomainConfigSet.First().GameDomain = domain;
             cont.SaveChanges();
@@ -58,12 +56,96 @@ namespace Negotiation.Models
 
         public static SideConfig GetHumanConfig()
         {
-            return new SideConfig { Side = Domain.OwnerVariantDict.Keys.First(), Variant = Domain.OwnerVariantDict.Values.First().Keys.First() };
+            return new SideConfig { Side = Domain.OwnerVariantDict.Keys.First(), Variant = Domain.OwnerVariantDict.Values.First().Keys.First() , Type = UserType.Human};
         }
 
         public static SideConfig GetAiConfig()
         {
-            return new SideConfig { Side = Domain.OwnerVariantDict.Keys.ElementAt(1), Variant = Domain.OwnerVariantDict.Values.ElementAt(1).Keys.First() };
+            return new SideConfig { Side = Domain.OwnerVariantDict.Keys.ElementAt(1), Variant = Domain.OwnerVariantDict.Values.ElementAt(1).Keys.First(), Type = UserType.Agent};
+        }
+
+        internal static void SaveNewNegotiation(string negotiationId, PreNegotiationQuestionnaireViewModel model, NegotiationEngine engine)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+
+            UserRole humanRole = new UserRole()
+            {
+                Description = engine.HumanConfig.Side,
+                Variant = engine.HumanConfig.Variant
+            };
+
+            UserData humanData = new UserData()
+            {
+                AgeRange = model.AgeRange,
+                Country = model.BirthCountry,
+                DegreeField = model.DegreeField,
+                Education = model.Education,
+                Gender = model.Gender,
+                StudentId = model.ID,
+                Name = model.Name,
+                University = model.University
+            };
+
+            User humanUser = new User()
+            {
+                Id = negotiationId,
+                Type = UserType.Human,
+                UserData = humanData,
+                UserRole = humanRole,
+                GameId = negotiationId
+            };
+
+            cont.GameSet.Add(new Game()
+                {
+                    Id = negotiationId,
+                    GameDomain = GameDomain,
+                    GameDomainId = GameDomain.Id,
+                    Users = new List<User> { humanUser }
+                });
+
+            cont.UserDataSet.Add(humanData);
+            cont.UserRoleSet.Add(humanRole);
+            cont.UserSet.Add(humanUser);
+
+            try
+            {
+                cont.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                
+                throw;
+            }
+            
+        }
+
+        private static void SaveAction(NegotiationEngine engine, SideConfig side, NegotiationActionType type, String value = "")
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+
+            var game = cont.GameSet.Find(engine.NegotiationId);
+            var user = game.Users.First(x => x.Type == side.Type);
+
+            cont.NegotiationActionSet.Add(new NegotiationAction()
+            {
+                GameId = engine.NegotiationId,
+                Type = NegotiationActionType.MakeOffer,
+                User = user,
+                RemainingTime = engine.Status.RemainingTime,
+                UserId = user.Id,
+                Value = value
+            });
+            cont.SaveChanges();
+        }
+
+        internal static void SaveNewOffer(NegotiationEngine engine, SideConfig side, string negotiationOffer)
+        {
+            SaveAction(engine, side, NegotiationActionType.MakeOffer, negotiationOffer);
+        }
+
+        internal static void SaveOptOut(NegotiationEngine engine, SideConfig side)
+        {
+            SaveAction(engine, side, NegotiationActionType.Optout);
         }
     }
 }

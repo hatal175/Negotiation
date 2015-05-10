@@ -64,10 +64,10 @@
             <td>
                 Time-out score:
             </td>
-            @foreach (var statusQuoScore in Model.Select(x => x.StatusQuoScore))
+            @foreach (var reservation in Model.Select(x => x.Reservation))
             {
                 <td>
-                    @String.Format("{0:+#;-#;0}", statusQuoScore)
+                    @String.Format("{0:+#;-#;0}", reservation)
                 </td>
             }
         </tr>

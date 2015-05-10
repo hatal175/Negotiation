@@ -27,7 +27,7 @@ namespace Negotiation
                       "~/Scripts/respond.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/datetime.1-1").Include(
-                      "~/Scripts/datetime.1-1")
+                      "~/Scripts/datetime.1-1.js")
                       );
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
