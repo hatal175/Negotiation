@@ -13,12 +13,25 @@ namespace Negotiation.Models
     {
         private System.Timers.Timer _timer;
 
+        public String NegotiationId { get; set; }
+        public NegotiationDomain Domain { get; private set; }
+        public SideConfig HumanConfig { get; set; }
+        public SideConfig AiConfig { get; set; }
+        public NegotiationStatus Status { get; set; }
+        public List<NegotiationActionModel> Actions { get; set; }
+
+        public INegotiationChannel HumanChannel { get; set; }
+        public INegotiationChannel AiChannel { get; set; }
+
+        public bool NegotiationActive { get; private set; }
+
         public NegotiationEngine(
             String negotiationId,
             NegotiationDomain domain, 
             SideConfig humanConfig,
             SideConfig aiConfig)
         {
+            NegotiationId = negotiationId;
             Domain = domain;
             HumanChannel = new LocalNegotiationChannel();
             AiChannel = new LocalNegotiationChannel();
@@ -127,7 +140,8 @@ namespace Negotiation.Models
                 {
                     Role = side.Side,
                     Type = NegotiationActionType.MakeOffer,
-                    Value = offer
+                    Value = offer,
+                    RemainingTime = Status.RemainingTime
                 });
 
             NegotiationManager.SaveNewOffer(this, side, offer);
@@ -137,18 +151,6 @@ namespace Negotiation.Models
                 GetOtherChannel((INegotiationChannel)sender).OpponentOfferReceived(e.Offer);
             });
         }
-
-        public String NegotiationId { get; set; }
-        public NegotiationDomain Domain { get; private set; }
-        public SideConfig HumanConfig { get; set; }
-        public SideConfig AiConfig { get; set; }
-        public NegotiationStatus Status { get; set; }
-        public List<NegotiationActionModel> Actions {get; set;}
-
-        public INegotiationChannel HumanChannel { get; set; }
-        public INegotiationChannel AiChannel { get; set; }
-
-        public bool NegotiationActive { get; private set; }
 
         public void BeginNegotiation()
         {
@@ -185,6 +187,7 @@ namespace Negotiation.Models
             {
                 Status.State = NegotiationState.EndTimeout;
                 EndNegotiation();
+                NegotiationManager.SaveTimeout(this);
             }
         }
     }

@@ -98,7 +98,6 @@ namespace Negotiation.Models
             cont.GameSet.Add(new Game()
                 {
                     Id = negotiationId,
-                    GameDomain = GameDomain,
                     GameDomainId = GameDomain.Id,
                     Users = new List<User> { humanUser }
                 });
@@ -146,6 +145,16 @@ namespace Negotiation.Models
         internal static void SaveOptOut(NegotiationEngine engine, SideConfig side)
         {
             SaveAction(engine, side, NegotiationActionType.Optout);
+        }
+
+        internal static void SaveOfferAccepted(NegotiationEngine engine, SideConfig side)
+        {
+            SaveAction(engine, side, NegotiationActionType.AcceptOffer);
+        }
+
+        internal static void SaveTimeout(NegotiationEngine engine)
+        {
+            SaveAction(engine, engine.HumanConfig, NegotiationActionType.Timeout);
         }
     }
 }

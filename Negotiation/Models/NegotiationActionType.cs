@@ -19,6 +19,7 @@ namespace Negotiation.Models
         AcceptOffer = 3,
         Optout = 4,
         OptoutReceive = 5,
-        Disconnect = 6
+        Disconnect = 6,
+        Timeout = 7
     }
 }

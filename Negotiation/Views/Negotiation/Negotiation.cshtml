@@ -192,7 +192,7 @@
     acceptOffer = function () {
         var data = {
             negotiationId : "@Model.Id"
-            };
+        };
         $.ajax({ url: 'AcceptOffer', type: "POST", data: JSON.stringify(data), contentType: 'application/json' });
     }
 
@@ -207,6 +207,9 @@
             success : function(result) {
                 $('#opponentOffer').html(result);
                 recheckOffer();
+            },
+            error : function(jqXHR, textStatus, errorThrown){
+                window.location.replace("/Negotiation/NegotiationEnd?negotiationId=" + '@Model.Id');
             }
         });
     }
@@ -223,6 +226,9 @@
             contentType: 'application/json',
             success : function(result) {
                 $('#actionHistory').html(result);
+            },
+            error : function(jqXHR, textStatus, errorThrown){
+                window.location.replace("/Negotiation/NegotiationEnd?negotiationId=" + '@Model.Id');
             }
         });
     }
@@ -247,7 +253,7 @@
 
     getTimeScore = function () {
         scorePerRound = @Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect;
-        
+
         negotiationTimer = document.getElementById("negotiationTimerText");
         timeText = negotiationTimer.innerHTML.trim();
         timeArr = timeText.split(":");

@@ -10,5 +10,6 @@ namespace Negotiation.Models
         public String Role { get; set; }
         public NegotiationActionType Type { get; set; }
         public String Value { get; set; }
+        public TimeSpan RemainingTime { get; set; }
     }
 }

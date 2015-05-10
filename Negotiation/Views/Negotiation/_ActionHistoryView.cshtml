@@ -8,6 +8,9 @@
     <table border="1">
         <tr>
             <th>
+                RemainingTime
+            </th>
+            <th>
                 Proposer
             </th>
             <th>
@@ -17,9 +20,12 @@
                 Value
             </th>
         </tr>
-        @foreach (var action in Model)
+        @foreach (var action in Model.Reverse())
         {
             <tr>
+                <td>
+                    @action.RemainingTime
+                </td>
                 <td>
                     @action.Role
                 </td>
