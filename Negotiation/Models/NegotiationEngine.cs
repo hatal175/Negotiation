@@ -16,20 +16,24 @@ namespace Negotiation.Models
         public String NegotiationId { get; set; }
         public NegotiationDomain Domain { get; private set; }
         public SideConfig HumanConfig { get; set; }
-        public SideConfig AiConfig { get; set; }
+        public AiConfig AiConfig { get; set; }
         public NegotiationStatus Status { get; set; }
         public List<NegotiationActionModel> Actions { get; set; }
+        public String StrategyName { get; set; }
 
         public INegotiationChannel HumanChannel { get; set; }
         public INegotiationChannel AiChannel { get; set; }
 
         public bool NegotiationActive { get; private set; }
 
+        public TimeSpan UpdateInterval { get; set; }
+
         public NegotiationEngine(
             String negotiationId,
-            NegotiationDomain domain, 
+            NegotiationDomain domain,
+            PreNegotiationQuestionnaireViewModel userData,
             SideConfig humanConfig,
-            SideConfig aiConfig)
+            AiConfig aiConfig)
         {
             NegotiationId = negotiationId;
             Domain = domain;
@@ -47,6 +51,15 @@ namespace Negotiation.Models
 
             Actions = new List<NegotiationActionModel>();
 
+            String strategyName;
+            IAgentStrategy strat = NegotiationManager.GetStrategy(aiConfig.StrategyId, out strategyName);
+            strat.Initialize(domain, aiConfig, AiChannel);
+
+            TimeSpan defaultInterval = TimeSpan.FromSeconds(1);
+            UpdateInterval = defaultInterval < strat.MinimumUpdateTime ? defaultInterval : strat.MinimumUpdateTime;
+
+            StrategyName = strategyName;
+
             RegisterChannel(HumanChannel);
             RegisterChannel(AiChannel);
         }
@@ -55,7 +68,7 @@ namespace Negotiation.Models
         {
             return new NegotiationOffer()
             {
-                Offers = Domain.Options.Topics.Keys.ToDictionary(x => x, x=>"---")
+                Offers = Domain.Options.Topics.Keys.ToDictionary(x => x, x => "---")
             };
         }
 
@@ -113,7 +126,20 @@ namespace Negotiation.Models
 
         void channel_OfferAcceptedEvent(object sender, EventArgs e)
         {
-            Status.State = sender == AiChannel ? NegotiationState.EndHumanOfferAccepted : NegotiationState.EndAiOfferAccepted;
+            NegotiationOffer offer;
+            if (sender == AiChannel)
+            {
+                Status.State = NegotiationState.EndHumanOfferAccepted;
+                offer = Status.HumanStatus.Offer;
+            }
+            else
+            {
+                Status.State = NegotiationState.EndAiOfferAccepted;
+                offer = Status.AiStatus.Offer;
+            }
+
+            Status.HumanStatus.Score = CalculateAcceptScore(HumanConfig, offer);
+            Status.AiStatus.Score = CalculateAcceptScore(AiConfig, offer);
 
             ThreadPool.QueueUserWorkItem(x =>
             {
@@ -129,12 +155,29 @@ namespace Negotiation.Models
             EndNegotiation();
         }
 
+        private int CalculateAcceptScore(SideConfig config, NegotiationOffer offer)
+        {
+            var variant = Domain.OwnerVariantDict[config.Side][config.Variant];
+            return offer.Offers.Sum(x=>variant.Topics[x.Key].Options[x.Value].Score) + variant.TimeEffect * Domain.RoundsPassed(Status.RemainingTime);
+        }
+
         void channel_NewOfferEvent(object sender, OfferEventArgs e)
         {
             JavaScriptSerializer js = new JavaScriptSerializer();
             string offer = js.Serialize(e.Offer);
 
-            SideConfig side = (((INegotiationChannel)sender) == AiChannel) ? AiConfig : HumanConfig;
+            SideConfig side;
+
+            if (((INegotiationChannel)sender) == AiChannel) 
+            {
+                side = AiConfig;
+                Status.AiStatus.Offer = e.Offer;
+            }
+            else
+	        {
+                side = HumanConfig;
+                Status.HumanStatus.Offer = e.Offer;
+	        }
 
             this.Actions.Add(new NegotiationActionModel()
                 {
@@ -157,7 +200,7 @@ namespace Negotiation.Models
             _timer = new System.Timers.Timer()
             {
                 AutoReset = true,
-                Interval = 1000
+                Interval = UpdateInterval.TotalMilliseconds
             };
 
             _timer.Elapsed += _timer_Elapsed;
@@ -175,6 +218,9 @@ namespace Negotiation.Models
             NegotiationActive = false;
             _timer.Enabled = false;
 
+            HumanChannel.NegotiationEnded();
+            AiChannel.NegotiationEnded();
+
             UnregisterChannel(HumanChannel);
             UnregisterChannel(AiChannel);
         }
@@ -186,9 +232,25 @@ namespace Negotiation.Models
             if (Status.RemainingTime.TotalSeconds == 0)
             {
                 Status.State = NegotiationState.EndTimeout;
+
+                Status.AiStatus.Score = CalculateTimeoutScore(AiConfig);
+                Status.HumanStatus.Score = CalculateTimeoutScore(HumanConfig);
+
                 EndNegotiation();
                 NegotiationManager.SaveTimeout(this);
+                return;
             }
+
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                AiChannel.TimePassed(Status.RemainingTime);
+            });
+        }
+
+        private int CalculateTimeoutScore(SideConfig config)
+        {
+            var variant = Domain.OwnerVariantDict[config.Side][config.Variant];
+            return variant.Reservation + variant.TimeEffect * Domain.RoundsPassed(Status.RemainingTime);
         }
     }
 }

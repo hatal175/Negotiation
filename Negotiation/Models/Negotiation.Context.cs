@@ -35,5 +35,6 @@ namespace Negotiation.Models
         public virtual DbSet<DomainVariant> DomainVariantSet { get; set; }
         public virtual DbSet<GameDomainConfig> GameDomainConfigSet { get; set; }
         public virtual DbSet<UserData> UserDataSet { get; set; }
+        public virtual DbSet<StrategyConfig> StrategyConfigSet { get; set; }
     }
 }

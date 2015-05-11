@@ -86,5 +86,26 @@ namespace Negotiation.Models
                 TimeOutEvent(this, EventArgs.Empty);
             }
         }
+
+        public event EventHandler<TimePassedEventArgs> TimePassedEvent;
+
+        public void TimePassed(TimeSpan remainingTime)
+        {
+            if (TimePassedEvent != null)
+            {
+                TimePassedEvent(this, new TimePassedEventArgs(remainingTime));
+            }
+        }
+
+
+        public event EventHandler NegotiationEndedEvent;
+
+        public void NegotiationEnded()
+        {
+            if (NegotiationEndedEvent != null)
+            {
+                NegotiationEndedEvent(this, EventArgs.Empty);
+            }
+        }
     }
 }

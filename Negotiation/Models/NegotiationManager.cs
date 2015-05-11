@@ -5,6 +5,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace Negotiation.Models
 {
@@ -13,6 +14,11 @@ namespace Negotiation.Models
         public String Side { get; set; }
         public String Variant { get; set; }
         public UserType Type { get; set; }
+    }
+
+    public class AiConfig : SideConfig
+    {
+        public int StrategyId { get; set; }
     }
 
     public class NegotiationManager
@@ -56,18 +62,33 @@ namespace Negotiation.Models
 
         public static SideConfig GetHumanConfig()
         {
-            return new SideConfig { Side = Domain.OwnerVariantDict.Keys.First(), Variant = Domain.OwnerVariantDict.Values.First().Keys.First() , Type = UserType.Human};
+            return new SideConfig 
+            { 
+                Side = Domain.OwnerVariantDict.Keys.First(), 
+                Variant = Domain.OwnerVariantDict.Values.First().Keys.First() , 
+                Type = UserType.Human
+            };
         }
 
-        public static SideConfig GetAiConfig()
+        public static AiConfig GetAiConfig()
         {
-            return new SideConfig { Side = Domain.OwnerVariantDict.Keys.ElementAt(1), Variant = Domain.OwnerVariantDict.Values.ElementAt(1).Keys.First(), Type = UserType.Agent};
+            NegotiationContainer cont = new NegotiationContainer();
+            var strat = cont.StrategyConfigSet.First();
+
+            return new AiConfig
+            {
+                Side = Domain.OwnerVariantDict.Keys.ElementAt(1), 
+                Variant = Domain.OwnerVariantDict.Values.ElementAt(1).Keys.First(), 
+                Type = UserType.Agent,
+                StrategyId = strat.Id
+            };
         }
 
-        internal static void SaveNewNegotiation(string negotiationId, PreNegotiationQuestionnaireViewModel model, NegotiationEngine engine)
+        internal static void SaveNewNegotiation(NegotiationEngine engine, PreNegotiationQuestionnaireViewModel model)
         {
             NegotiationContainer cont = new NegotiationContainer();
 
+            #region Human User
             UserRole humanRole = new UserRole()
             {
                 Description = engine.HumanConfig.Side,
@@ -88,23 +109,45 @@ namespace Negotiation.Models
 
             User humanUser = new User()
             {
-                Id = negotiationId,
+                Id = engine.NegotiationId,
                 Type = UserType.Human,
                 UserData = humanData,
                 UserRole = humanRole,
-                GameId = negotiationId
+                GameId = engine.NegotiationId
             };
+
+            #endregion
+
+            #region Ai User
+
+            UserRole aiRole = new UserRole()
+            {
+                Description = engine.AiConfig.Side,
+                Variant = engine.AiConfig.Variant
+            };
+
+            User aiUser = new User()
+            {
+                Id = engine.StrategyName + "|" + DateTime.Now,
+                Type = UserType.Agent,
+                StrategyId = engine.AiConfig.StrategyId,
+                UserRole = aiRole,
+                GameId = engine.NegotiationId,
+            };
+
+            #endregion
 
             cont.GameSet.Add(new Game()
                 {
-                    Id = negotiationId,
-                    GameDomainId = GameDomain.Id,
-                    Users = new List<User> { humanUser }
+                    Id = engine.NegotiationId,
+                    GameDomainId = GameDomain.Id
                 });
 
             cont.UserDataSet.Add(humanData);
             cont.UserRoleSet.Add(humanRole);
+            cont.UserRoleSet.Add(aiRole);
             cont.UserSet.Add(humanUser);
+            cont.UserSet.Add(aiUser);
 
             try
             {
@@ -112,10 +155,8 @@ namespace Negotiation.Models
             }
             catch (Exception ex)
             {
-                
                 throw;
             }
-            
         }
 
         private static void SaveAction(NegotiationEngine engine, SideConfig side, NegotiationActionType type, String value = "")
@@ -155,6 +196,20 @@ namespace Negotiation.Models
         internal static void SaveTimeout(NegotiationEngine engine)
         {
             SaveAction(engine, engine.HumanConfig, NegotiationActionType.Timeout);
+        }
+
+        internal static IAgentStrategy GetStrategy(int strategyId, out String strategyName)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            var strat = cont.StrategySet.Find(strategyId);
+
+            Assembly assembly = Assembly.LoadFile(HttpContext.Current.Server.MapPath(strat.DllPath));
+            Type type = assembly.GetTypes().First(x => x.GetInterface("IAgentStrategy") != null);
+            IAgentStrategy example = assembly.CreateInstance(type.FullName) as IAgentStrategy;
+
+            strategyName = strat.StrategyName;
+
+            return example;
         }
     }
 }

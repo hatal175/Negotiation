@@ -9,6 +9,7 @@ using Negotiation.App_Start;
 
 namespace Negotiation.Controllers
 {
+    [SessionState(System.Web.SessionState.SessionStateBehavior.Disabled)]
     public class NegotiationController : Controller
     {
         // GET: Negotiation
@@ -50,11 +51,11 @@ namespace Negotiation.Controllers
                 new NegotiationEngine(
                     id,
                     NegotiationManager.Domain, 
+                    model,
                     NegotiationManager.GetHumanConfig(), 
                     NegotiationManager.GetAiConfig());
 
-            //TODO: uncomment when finished
-            NegotiationManager.SaveNewNegotiation(id, model, engine);
+            NegotiationManager.SaveNewNegotiation(engine, model);
             NegotiationManager.OnGoingNegotiations.TryAdd(id, engine);
 
             return id;
@@ -178,7 +179,9 @@ namespace Negotiation.Controllers
                 HumanConfig = engine.HumanConfig,
                 RemainingTime = engine.Status.RemainingTime,
                 Domain = engine.Domain,
-                Actions = new List<NegotiationActionModel>()
+                Actions = engine.Actions,
+                OpponentOffer = engine.Status.AiStatus.Offer,
+                Offer = engine.Status.HumanStatus.Offer
             };
 
             return View(model);
@@ -216,11 +219,7 @@ namespace Negotiation.Controllers
             engine.HumanChannel.AcceptOffer();
 
             return View("NegotiationEndView",
-                new NegotiationEndModel()
-                {
-                    Score = engine.Status.HumanStatus.Score,
-                    Message = "You accepted your opoonent's offer."
-                });
+                engine.GetEndModel());
         }
 
         public ActionResult UpdateOpponentOffer(String negotiationId)

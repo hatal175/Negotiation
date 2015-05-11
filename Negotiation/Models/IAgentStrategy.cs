@@ -9,7 +9,6 @@ namespace Negotiation.Models
     {
         TimeSpan MinimumUpdateTime {get;}
 
-        void Initialize(NegotiationDomain domain, ScoringVariant variant, INegotiationChannel channel);
-        void UpdateNegotiationStatus(NegotiationStatus status);
+        void Initialize(NegotiationDomain domain, SideConfig config, INegotiationClient client);
     }
 }

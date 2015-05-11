@@ -15,6 +15,7 @@ namespace Negotiation.Models
     public partial class Strategy
     {
         public int Id { get; set; }
-        public string DllMd5Hash { get; set; }
+        public string DllPath { get; set; }
+        public string StrategyName { get; set; }
     }
 }

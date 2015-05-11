@@ -246,10 +246,13 @@
     <Compile Include="Models\NegotiationViewModel.cs" />
     <Compile Include="Models\PreNegotiationQuestionnaireViewModel.cs" />
     <Compile Include="Models\ScoredNegotiationOption.cs" />
-    <Compile Include="Models\ScoringVariant.cs" />
     <Compile Include="Models\Strategy.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\StrategyConfig.cs">
+      <DependentUpon>Negotiation.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TimePassedEventArgs.cs" />
     <Compile Include="Models\User.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
@@ -359,6 +362,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Dlls\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

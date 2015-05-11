@@ -23,9 +23,11 @@ namespace Negotiation.Models
         event EventHandler OptOutEvent;
         
         void NegotiationStarted();
+        void NegotiationEnded();
         void OpponentOfferReceived(NegotiationOffer offer);
         void OpponentAcceptedOffer();
         void OpponentOptOutReceived();
         void TimeOut();
+        void TimePassed(TimeSpan remainingTime);
     }
 }

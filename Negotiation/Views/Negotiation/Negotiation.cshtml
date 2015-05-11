@@ -105,7 +105,6 @@
                                             <b>Your Score:</b>
                                         </td>
                                         <td id="yourScore">
-                                            @(Model.Offer.Offers.Values.Sum(x => int.Parse(x)) + Model.Domain.RoundsPassed(Model.RemainingTime) * Model.Domain.OwnerVariantDict[Model.HumanConfig.Side][Model.HumanConfig.Variant].TimeEffect)
                                         </td>
                                     </tr>
                                 </table>
@@ -266,7 +265,8 @@
 
     recheckOffer = function () {
 
-        scoreSum = 0;
+        var scoreSum = 0;
+        var acceptButtonDisabled = false;
 
         $('[data_id="Offer"]').each(function(index,offer) {
             var offer_id = offer["id"];
@@ -274,20 +274,20 @@
 
             if (op_offer.innerHTML.trim() == "---") {
                 offer.style.backgroundColor = "White";
+                acceptButtonDisabled = true;
+            }
+            else if (offer.selectedIndex == -1 || offer.options[offer.selectedIndex].text != op_offer.innerHTML.trim()) {
+                offer.style.backgroundColor = "Pink";
+                acceptButtonDisabled = true;
             }
             else {
-                document.getElementById("myBtn").disabled = false;
-
-                if (offer.selectedIndex == -1 || offer.options[offer.selectedIndex].text != op_offer.text) {
-                    offer.style.backgroundColor = "Pink";
-                }
-                else {
-                    offer.style.backgroundColor = "LightGreen";
-                }
+                offer.style.backgroundColor = "LightGreen";
             }
-            console.log("ssss" + scoreSum);
+
             scoreSum += parseInt(offer.options[offer.selectedIndex].getAttribute("data-score"));
         });
+
+        document.getElementById("acceptButton").disabled = acceptButtonDisabled;
 
         document.getElementById("yourScore").innerHTML = scoreSum + getTimeScore();
     };
