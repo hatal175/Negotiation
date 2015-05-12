@@ -1,0 +1,145 @@
+﻿@model Negotiation.Models.TutorialPresentationModel
+@{
+    Layout = null;
+    ViewBag.Title = "Tutorial";
+}
+@using Negotiation.Models
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TutorialView</title>
+</head>
+<body>
+    <div>
+        <h1>Task:</h1> 
+        You are about to take part in a negotiation between 
+        <span style="color:blue">@Model.HumanConfig.Side</span> 
+        and <span style="color:red">@Model.AiConfig.Side</span style="color:red">.
+        <br /><br />
+        You are the <span style="color:blue">@Model.HumanConfig.Side</span>
+
+
+        <h2>Those are the negotiation issues:</h2>
+        <ul>
+            @foreach (var issue in @Model.Domain.Options.Topics)
+            {
+                <li>@(issue.Key):</li>
+            }
+        </ul>
+
+        <h2>Each Issue Has Set Possibilities:</h2>
+        <ul>
+            @foreach (var issue in @Model.Domain.Options.Topics)
+            {
+                <li style="color:red">@(issue.Key):<br />
+                    {@issue.Value.Options.Select(x=>x.Key).Aggregate((x,y)=>x+", "+y)}</li>
+            }
+        </ul>
+
+        <h2>Your Goal (if you choose to accept it):</h2>
+        <ol>
+            <li>Make as good an agreement as you can.</li>
+            <li>"Good Agreements" are defined based on a score table</li>
+        </ol>
+
+        <br />
+        <u><b>Please Note:</b></u> These score tables are available in the negotiation session.
+        You don't need to memorize them.
+        <br /><br /><br />
+
+        <table>
+            <tr>
+                <td width="400px" style="vertical-align:top">
+                    Your
+                    <span style="color:blue">score table</span> shows the score you get for each value
+                    in the negotiation issues, if an agreement has been reached.
+                    <br />
+                    <br />
+                    Some issues contain a "no agreement" value. These issues are
+                    <span style="color:blue">minor issues</span>, and an agreement can be reached without
+                    agreeing on them explicitly.
+                </td>
+                <td>
+                    @Html.Partial("NegotiationSideView", new List<Negotiation.Models.NegotiationSideDescription>() { Model.Domain.GetSideDescription(Model.HumanConfig) })
+                </td>
+            </tr>
+        </table>
+
+        <h2>Negotiation Time:</h2>
+        <span style="color:blue">Maximum of 
+        @(TimeSpan.FromSeconds(Model.Domain.RoundLength.TotalSeconds * Model.Domain.NumberOfRounds).TotalMinutes)</span> minutes.
+        <br />
+        <br />
+        Time affects the values of the agreement. As time passed, both sides lose points.
+        <br />
+        <div style="border:solid; border-color:blue">
+            <span style="color:blue">@Model.HumanConfig.Side (you)</span> 
+            lose
+            <span style="color:blue">@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()</span>
+            points with each passing round.
+            <span style="color:blue">@Model.AiConfig.Side (your opponent)</span>
+            lose
+            <span style="color:blue">@Model.Domain.GetSideDescription(Model.AiConfig).TimeEffect.FormatWithSign()</span>
+            points with each passing round.
+        </div>
+        <h2>Note:</h2>
+        <b>
+            Because of this, it may be better to get a worse agreement quickly.
+        </b>
+
+        <h2>No Agreement:</h2>
+        If there is <u>no agreement</u> by the end of the allocated time (maximum @Model.Domain.NumberOfRounds rounds),
+        the job interview ends with the candidate being hired with a <u>standard contract</u> 
+        (called <span style="color:red">Status quo</span>).
+        <br /> <br />
+        <div style="border:solid; border-color:blue">
+            Your score from <span style="color:red">Status-quo after @Model.Domain.NumberOfRounds</span>
+            rounds: @(Model.Domain.GetSideDescription(Model.HumanConfig).Reservation)+
+            (@(Model.Domain.NumberOfRounds)*
+            (@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()))=
+            @(Model.Domain.CalculateTimeoutScore(Model.HumanConfig))
+            <br />
+            <b style="font-size:larger">Not usually a good strategy</b>
+        </div>
+
+        <h2>Opting out:</h2>
+        Each sides can decide at any time to <span style="color:red">opt out</span> of the
+        negotiation if it feelds that there is nor more hope to reach an agreement via negotiation.
+        <br /> <br />
+        <div style="border:solid; border-color:blue">
+            Your score from <span style="color:red">opting-out after 6 rounds</span>
+            rounds: @(Model.Domain.GetSideDescription(Model.HumanConfig).Optout)+
+            (6*
+            (@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()))=
+            @(Model.Domain.CalculateOptoutScore(Model.HumanConfig, 6))
+            <br />
+            <b style="font-size:larger">Not usually a good strategy</b>
+        </div>
+
+        <h2>Your Negotiation Partner:</h2>
+        Your negotiation partner can be characterized by one of the three following types:
+        <ul style ="color:blue">
+            @foreach (var variant in @Model.Domain.OwnerVariantDict[Model.AiConfig.Side].Values)
+            {
+                <li>@variant.Name</li>
+            }
+        </ul>
+        <br />
+        <table>
+            <tr>
+                <td width="400px" style="vertical-align:top">
+                    The type of person will impact their score (table at right).
+                    <br />
+                    You do <b>not</b> know what type the person is.
+                </td>
+                <td>
+                    @Html.Partial("NegotiationSideView", Model.Domain.OwnerVariantDict[Model.AiConfig.Side].Values)
+                </td>
+            </tr>
+        </table>
+</div>
+</body>
+</html>

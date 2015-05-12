@@ -63,6 +63,11 @@ namespace Negotiation.Controllers
 
         public ActionResult NegotiationTutorial(NegotiationTutorialModel model)
         {
+            if (model == null || model.TutorialId == null)
+            {
+                return RedirectToAction("Negotiation");
+            }
+
             return View("NegotiationTutorial",model);
         }
 
@@ -290,6 +295,20 @@ namespace Negotiation.Controllers
                 return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
 
             return View("NegotiationEndView", (object)engine.GetEndModel());
+        }
+
+        public ActionResult Tutorial(string negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            return View("TutorialPresentationView", new TutorialPresentationModel()
+                {
+                    HumanConfig = engine.HumanConfig,
+                    AiConfig = engine.AiConfig,
+                    Domain = engine.Domain
+                });
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Negotiation.Models.NegotiationSideDescription>
+@using Negotiation.Models
 @{
     <table border="1">
         <tr>
@@ -45,7 +46,7 @@
             @foreach (var time in Model.Select(x => x.TimeEffect))
             {
                 <td>
-                    @String.Format("{0:+#;-#;0}", time)
+                    @time.FormatWithSign()
                 </td>
             }
         </tr>
@@ -56,7 +57,7 @@
             @foreach (var optout in Model.Select(x => x.Optout))
             {
                 <td>
-                    @String.Format("{0:+#;-#;0}", optout)
+                    @optout.FormatWithSign()
                 </td>
             }
         </tr>
@@ -67,7 +68,7 @@
             @foreach (var reservation in Model.Select(x => x.Reservation))
             {
                 <td>
-                    @String.Format("{0:+#;-#;0}", reservation)
+                    @reservation.FormatWithSign()
                 </td>
             }
         </tr>

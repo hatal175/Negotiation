@@ -101,8 +101,8 @@ namespace Negotiation.Models
 
             EndNegotiation();
 
-            Status.HumanStatus.Score = CalculateOptoutScore(HumanConfig);
-            Status.AiStatus.Score = CalculateOptoutScore(AiConfig);
+            Status.HumanStatus.Score = Domain.CalculateOptoutScore(HumanConfig, Status.RemainingTime);
+            Status.AiStatus.Score = Domain.CalculateOptoutScore(AiConfig, Status.RemainingTime);
 
             this.Actions.Add(new NegotiationActionModel()
             {
@@ -111,12 +111,6 @@ namespace Negotiation.Models
             });
 
             NegotiationManager.SaveOptOut(this, sender == AiChannel ? AiConfig : HumanConfig);
-        }
-
-        int CalculateOptoutScore(SideConfig config)
-        {
-            var variant = Domain.OwnerVariantDict[config.Side][config.Variant];
-            return variant.Optout + variant.TimeEffect * Domain.RoundsPassed(Status.RemainingTime);
         }
 
         INegotiationChannel GetOtherChannel(INegotiationChannel channel)
@@ -233,8 +227,8 @@ namespace Negotiation.Models
             {
                 Status.State = NegotiationState.EndTimeout;
 
-                Status.AiStatus.Score = CalculateTimeoutScore(AiConfig);
-                Status.HumanStatus.Score = CalculateTimeoutScore(HumanConfig);
+                Status.AiStatus.Score = Domain.CalculateTimeoutScore(AiConfig);
+                Status.HumanStatus.Score = Domain.CalculateTimeoutScore(HumanConfig);
 
                 EndNegotiation();
                 NegotiationManager.SaveTimeout(this);
@@ -247,10 +241,6 @@ namespace Negotiation.Models
             });
         }
 
-        private int CalculateTimeoutScore(SideConfig config)
-        {
-            var variant = Domain.OwnerVariantDict[config.Side][config.Variant];
-            return variant.Reservation + variant.TimeEffect * Domain.RoundsPassed(Status.RemainingTime);
-        }
+        
     }
 }

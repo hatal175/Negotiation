@@ -182,6 +182,7 @@
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EnumUtils.cs" />
+    <Compile Include="Models\FormatUtils.cs" />
     <Compile Include="Models\Game.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
@@ -194,6 +195,7 @@
     <Compile Include="Models\Gender.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\IEnumerableUtils.cs" />
     <Compile Include="Models\IXmlExtractable.cs" />
     <Compile Include="Models\Model1.cs">
       <AutoGen>True</AutoGen>
@@ -253,6 +255,7 @@
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TimePassedEventArgs.cs" />
+    <Compile Include="Models\TutorialPresentationModel.cs" />
     <Compile Include="Models\User.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
@@ -359,6 +362,7 @@
     <Content Include="Views\Negotiation\_ActionHistoryView.cshtml" />
     <Content Include="Views\Negotiation\NegotiationEndView.cshtml" />
     <Content Include="Views\Negotiation\NegotiationTimerView.cshtml" />
+    <Content Include="Views\Negotiation\TutorialPresentationView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

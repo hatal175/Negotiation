@@ -7,7 +7,7 @@
 <h2 style="text-align:center">Negotiation Tutorial</h2>
 
 <div>
-    Please read the tutorial presentation (opens in a new window), then answer the questions below:<br />
+    Please read the @Html.ActionLink("tutorial presentation", "Tutorial", new { negotiationId = Model.TutorialId }, new { target = "_blank" }) (opens in a new window), then answer the questions below:<br />
 </div>
 
 @using (Html.BeginForm("SubmitTutorialAnswers", "Negotiation", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))

@@ -57,5 +57,22 @@ namespace Negotiation.Models
 
             return desc;
         }
+
+        public int CalculateTimeoutScore(SideConfig config)
+        {
+            var variant = OwnerVariantDict[config.Side][config.Variant];
+            return variant.Reservation + variant.TimeEffect * NumberOfRounds;
+        }
+
+        public int CalculateOptoutScore(SideConfig config, TimeSpan remainingTime)
+        {
+            return CalculateOptoutScore(config, RoundsPassed(remainingTime));
+        }
+
+        public int CalculateOptoutScore(SideConfig config, int roundsPassed)
+        {
+            var variant = OwnerVariantDict[config.Side][config.Variant];
+            return variant.Optout + variant.TimeEffect * roundsPassed;
+        }
     }
 }
