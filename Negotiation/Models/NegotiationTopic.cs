@@ -9,11 +9,13 @@ namespace Negotiation.Models
     public class NegotiationTopic<T> : IXmlExtractable where T : NegotiationOption, IXmlExtractable, new()
     {
         public String Name { get; set; }
+        public int Index { get; set; }
         public Dictionary<String,T> Options { get; set; }
 
         public virtual void Extract(System.Xml.XmlNode node)
         {
             Name = node.Attributes["name"].Value;
+            Index = int.Parse(node.Attributes["index"].Value);
             Options = node.ChildNodes.Cast<XmlNode>().ToDictionary(x=>x.Attributes["value"].Value, 
                 x=>{
                     T temp = new T();

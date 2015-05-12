@@ -97,10 +97,7 @@
         <br /> <br />
         <div style="border:solid; border-color:blue">
             Your score from <span style="color:red">Status-quo after @Model.Domain.NumberOfRounds</span>
-            rounds: @(Model.Domain.GetSideDescription(Model.HumanConfig).Reservation)+
-            (@(Model.Domain.NumberOfRounds)*
-            (@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()))=
-            @(Model.Domain.CalculateTimeoutScore(Model.HumanConfig))
+            rounds: @(Model.Domain.GetSideDescription(Model.HumanConfig).Reservation)+(@(Model.Domain.NumberOfRounds)*(@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()))=@(Model.Domain.CalculateTimeoutScore(Model.HumanConfig))
             <br />
             <b style="font-size:larger">Not usually a good strategy</b>
         </div>
@@ -111,10 +108,7 @@
         <br /> <br />
         <div style="border:solid; border-color:blue">
             Your score from <span style="color:red">opting-out after 6 rounds</span>
-            rounds: @(Model.Domain.GetSideDescription(Model.HumanConfig).Optout)+
-            (6*
-            (@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()))=
-            @(Model.Domain.CalculateOptoutScore(Model.HumanConfig, 6))
+            rounds: @(Model.Domain.GetSideDescription(Model.HumanConfig).Optout)+(6*(@Model.Domain.GetSideDescription(Model.HumanConfig).TimeEffect.FormatWithSign()))=@(Model.Domain.CalculateOptoutScore(Model.HumanConfig, 6))
             <br />
             <b style="font-size:larger">Not usually a good strategy</b>
         </div>

@@ -11,7 +11,6 @@ namespace Negotiation.Models
     {
         public NegotiationOption()
         {
-
         }
 
         public string Name { get; set; }

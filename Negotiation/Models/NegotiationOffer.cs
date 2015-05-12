@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Negotiation.Models
 {
-    public class NegotiationOffer
+    public class NegotiationOffer : IEquatable<NegotiationOffer>
     {
         public NegotiationOffer()
         {
@@ -13,5 +13,10 @@ namespace Negotiation.Models
         }
 
         public Dictionary<String,String> Offers { get; set; }
+
+        public bool Equals(NegotiationOffer other)
+        {
+            return (other != null && Offers.Count == other.Offers.Count && !Offers.Except(other.Offers).Any());
+        }
     }
 }
