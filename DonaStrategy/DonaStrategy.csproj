@@ -40,7 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DonaStrategy.cs" />
+    <Compile Include="OfferUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UtilityData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Negotiation\Negotiation.csproj">

@@ -6,11 +6,19 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Timers;
 
 namespace Negotiation.Models
 {
     public class SideConfig
     {
+        public SideConfig() { }
+        public SideConfig(String side, String variant)
+        {
+            Side = side;
+            Variant = variant;
+        }
+
         public String Side { get; set; }
         public String Variant { get; set; }
         public UserType Type { get; set; }
@@ -28,6 +36,7 @@ namespace Negotiation.Models
 
         public static int TotalRounds;
         public static TimeSpan RoundLength;
+        public static Timer m_cleanupTimer;
 
         static NegotiationManager()
         {
@@ -36,6 +45,22 @@ namespace Negotiation.Models
             OnGoingNegotiations = new ConcurrentDictionary<string, NegotiationEngine>();
             TutorialModels = new ConcurrentDictionary<string, NegotiationTutorialModel>();
             LoadDbData();
+
+            m_cleanupTimer = new Timer(TimeSpan.FromMinutes(1).TotalMilliseconds);
+            m_cleanupTimer.Elapsed += m_cleanupTimer_Elapsed;
+        }
+
+        static void m_cleanupTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            foreach (var kvp in OnGoingNegotiations)
+            {
+                if (!kvp.Value.NegotiationActive && DateTime.Now - kvp.Value.NegotiationEndTime > TimeSpan.FromMinutes(10))
+                {
+                    NegotiationEngine engine;
+                    OnGoingNegotiations.TryRemove(kvp.Key, out engine);
+                }
+            }
+           
         }
 
         static public GameDomain GameDomain { get; set; }
@@ -153,7 +178,7 @@ namespace Negotiation.Models
             {
                 cont.SaveChanges();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

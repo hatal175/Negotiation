@@ -12,6 +12,7 @@ namespace Negotiation.Models
     public class NegotiationEngine
     {
         private System.Timers.Timer _timer;
+        
 
         public String NegotiationId { get; set; }
         public NegotiationDomain Domain { get; private set; }
@@ -27,6 +28,7 @@ namespace Negotiation.Models
         public bool NegotiationActive { get; private set; }
 
         public TimeSpan UpdateInterval { get; set; }
+        public DateTime NegotiationEndTime { get; private set; }
 
         public NegotiationEngine(
             String negotiationId,
@@ -53,7 +55,7 @@ namespace Negotiation.Models
 
             String strategyName;
             IAgentStrategy strat = NegotiationManager.GetStrategy(aiConfig.StrategyId, out strategyName);
-            strat.Initialize(domain, aiConfig, AiChannel);
+            strat.Initialize(domain, aiConfig, humanConfig.Side, AiChannel);
 
             TimeSpan defaultInterval = TimeSpan.FromSeconds(1);
             UpdateInterval = defaultInterval < strat.MinimumUpdateTime ? defaultInterval : strat.MinimumUpdateTime;
@@ -211,6 +213,7 @@ namespace Negotiation.Models
         {
             NegotiationActive = false;
             _timer.Enabled = false;
+            NegotiationEndTime = DateTime.Now;
 
             HumanChannel.NegotiationEnded();
             AiChannel.NegotiationEnded();

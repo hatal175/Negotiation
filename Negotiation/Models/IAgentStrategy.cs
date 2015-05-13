@@ -9,6 +9,6 @@ namespace Negotiation.Models
     {
         TimeSpan MinimumUpdateTime {get;}
 
-        void Initialize(NegotiationDomain domain, SideConfig config, INegotiationClient client);
+        void Initialize(NegotiationDomain domain, SideConfig strategyConfig, String opponentSide, INegotiationClient client);
     }
 }
