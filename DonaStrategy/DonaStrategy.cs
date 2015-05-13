@@ -135,7 +135,7 @@ namespace DonaStrategy
             if (m_currentOffer != offer)
             {
                 m_currentOffer = offer;
-                Client.SendOffer(m_bestOffer);
+                Client.SendOffer(m_currentOffer);
             }
         }
 
