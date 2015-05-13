@@ -18,15 +18,15 @@ namespace Negotiation.Models
         {
             this.Users = new HashSet<User>();
             this.NegotiationActions = new HashSet<NegotiationAction>();
-            this.UserResult = new HashSet<UserResult>();
         }
     
         public string Id { get; set; }
         public int GameDomainId { get; set; }
+        public System.DateTime StartTime { get; set; }
+        public Nullable<System.DateTime> Endtime { get; set; }
     
         public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<NegotiationAction> NegotiationActions { get; set; }
         public virtual GameDomain GameDomain { get; set; }
-        public virtual ICollection<UserResult> UserResult { get; set; }
     }
 }

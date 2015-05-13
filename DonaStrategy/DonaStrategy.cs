@@ -12,6 +12,7 @@ namespace DonaStrategy
         private int m_roundsPassed = 0;
         private NegotiationOffer m_bestOffer;
         private Dictionary<string, OfferUtility> m_bestCombinedUtilityOffers;
+        private Dictionary<string, OfferUtility> m_bestFScoreUtilityOffers;
         private NegotiationOffer m_currentOffer;
 
         private Dictionary<NegotiationOffer, OfferUtility> m_allOptions;
@@ -89,7 +90,8 @@ namespace DonaStrategy
 
             m_bestOffer = m_allOptions.Values.ArgMax(x => x.Utility).Offer;
 
-            m_bestCombinedUtilityOffers = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(k => k, variantName => m_allOptions.Values.OrderByDescending(x => x.UtilityDataDict[variantName].CombinedUtility).First(x => x.Utility > x.UtilityDataDict[variantName].CombinedUtility));
+            m_bestCombinedUtilityOffers = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(k => k, variantName => m_allOptions.Values.OrderByDescending(x => x.UtilityDataDict[variantName].CombinedUtility).First(x => x.Utility > x.UtilityDataDict[variantName].OpponentUtility));
+            m_bestFScoreUtilityOffers = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(k => k, variantName => m_allOptions.Values.OrderByDescending(x => x.UtilityDataDict[variantName].FScore).First(x => x.Utility > x.UtilityDataDict[variantName].OpponentUtility));
         }
 
         void Client_TimePassedEvent(object sender, TimePassedEventArgs e)
@@ -102,6 +104,10 @@ namespace DonaStrategy
             {
                 SendOffer(m_bestCombinedUtilityOffers.Values.ElementAt(roundsPassed - 1).Offer);
             }
+            else if (roundsPassed < m_bestCombinedUtilityOffers.Count + m_bestFScoreUtilityOffers.Count)
+            {
+                SendOffer(m_bestFScoreUtilityOffers.Values.ElementAt(roundsPassed - m_bestCombinedUtilityOffers.Count - 1).Offer);
+            }
 
             m_roundsPassed = roundsPassed;
         }
@@ -113,7 +119,7 @@ namespace DonaStrategy
                 return;
             }
 
-            if (m_allOptions[e.Offer].Utility > m_allOptions[m_currentOffer].Utility)
+            if (m_allOptions[e.Offer].Utility >= m_allOptions[m_currentOffer].Utility)
             {
                 Client.AcceptOffer();
             }
@@ -126,8 +132,11 @@ namespace DonaStrategy
 
         void SendOffer(NegotiationOffer offer)
         {
-            m_currentOffer = offer;
-            Client.SendOffer(m_bestOffer);
+            if (m_currentOffer != offer)
+            {
+                m_currentOffer = offer;
+                Client.SendOffer(m_bestOffer);
+            }
         }
 
         void client_NegotiationEndedEvent(object sender, EventArgs e)

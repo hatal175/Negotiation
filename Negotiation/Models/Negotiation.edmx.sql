@@ -2,8 +2,8 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 05/11/2015 22:11:49
--- Generated from EDMX file: C:\Users\Inbal\documents\visual studio 2013\Projects\Negotiation\Negotiation\Models\Negotiation.edmx
+-- Date Created: 05/13/2015 22:36:05
+-- Generated from EDMX file: C:\Users\Inbal\Documents\Visual Studio 2013\Projects\Negotiation\Negotiation\Models\Negotiation.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
@@ -31,9 +31,6 @@ IF OBJECT_ID(N'[dbo].[FK_GameNegotiationAction]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_GameGameDomain]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[GameSet] DROP CONSTRAINT [FK_GameGameDomain];
-GO
-IF OBJECT_ID(N'[dbo].[FK_GameUserResult]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[UserResultSet] DROP CONSTRAINT [FK_GameUserResult];
 GO
 IF OBJECT_ID(N'[dbo].[FK_UserStrategy]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[UserSet] DROP CONSTRAINT [FK_UserStrategy];
@@ -69,9 +66,6 @@ IF OBJECT_ID(N'[dbo].[GameSet]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[GameDomainSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[GameDomainSet];
-GO
-IF OBJECT_ID(N'[dbo].[UserResultSet]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[UserResultSet];
 GO
 IF OBJECT_ID(N'[dbo].[StrategySet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[StrategySet];
@@ -110,6 +104,7 @@ CREATE TABLE [dbo].[UserSet] (
     [Type] tinyint  NOT NULL,
     [GameId] nvarchar(255)  NOT NULL,
     [StrategyId] int  NULL,
+    [Score] int  NULL,
     [UserRole_Id] int  NOT NULL
 );
 GO
@@ -125,7 +120,9 @@ GO
 -- Creating table 'GameSet'
 CREATE TABLE [dbo].[GameSet] (
     [Id] nvarchar(255)  NOT NULL,
-    [GameDomainId] int  NOT NULL
+    [GameDomainId] int  NOT NULL,
+    [StartTime] datetime  NOT NULL,
+    [Endtime] datetime  NULL
 );
 GO
 
@@ -134,14 +131,6 @@ CREATE TABLE [dbo].[GameDomainSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [DomainXML] nvarchar(max)  NOT NULL,
     [Name] nvarchar(max)  NOT NULL
-);
-GO
-
--- Creating table 'UserResultSet'
-CREATE TABLE [dbo].[UserResultSet] (
-    [Id] int IDENTITY(1,1) NOT NULL,
-    [GameId] nvarchar(255)  NOT NULL,
-    [UserScore] int  NOT NULL
 );
 GO
 
@@ -220,12 +209,6 @@ GO
 -- Creating primary key on [Id] in table 'GameDomainSet'
 ALTER TABLE [dbo].[GameDomainSet]
 ADD CONSTRAINT [PK_GameDomainSet]
-    PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
-
--- Creating primary key on [Id] in table 'UserResultSet'
-ALTER TABLE [dbo].[UserResultSet]
-ADD CONSTRAINT [PK_UserResultSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -336,21 +319,6 @@ GO
 CREATE INDEX [IX_FK_GameGameDomain]
 ON [dbo].[GameSet]
     ([GameDomainId]);
-GO
-
--- Creating foreign key on [GameId] in table 'UserResultSet'
-ALTER TABLE [dbo].[UserResultSet]
-ADD CONSTRAINT [FK_GameUserResult]
-    FOREIGN KEY ([GameId])
-    REFERENCES [dbo].[GameSet]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_GameUserResult'
-CREATE INDEX [IX_FK_GameUserResult]
-ON [dbo].[UserResultSet]
-    ([GameId]);
 GO
 
 -- Creating foreign key on [StrategyId] in table 'UserSet'

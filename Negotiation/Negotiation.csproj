@@ -162,14 +162,11 @@
     <Compile Include="App_Start\NegotiationConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\NegotiationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AgentNegotiator.cs" />
     <Compile Include="Models\AgeRange.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
@@ -235,7 +232,6 @@
     <Compile Include="Models\INegotiationClient.cs" />
     <Compile Include="Models\INegotiationServer.cs" />
     <Compile Include="Models\LocalNegotiationChannel.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\NegotiationDescription.cs" />
     <Compile Include="Models\NegotiationEngine.cs" />
     <Compile Include="Models\NegotiationDomain.cs" />
@@ -260,9 +256,6 @@
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\UserData.cs">
-      <DependentUpon>Negotiation.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\UserResult.cs">
       <DependentUpon>Negotiation.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\UserRole.cs">
@@ -333,36 +326,22 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-    <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
-    <Content Include="Views\Account\ConfirmEmail.cshtml" />
-    <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
-    <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
-    <Content Include="Views\Account\ForgotPassword.cshtml" />
-    <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\Login.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Account\ResetPassword.cshtml" />
-    <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\SendCode.cshtml" />
-    <Content Include="Views\Account\VerifyCode.cshtml" />
-    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
-    <Content Include="Views\Manage\Index.cshtml" />
-    <Content Include="Views\Manage\ManageLogins.cshtml" />
-    <Content Include="Views\Manage\SetPassword.cshtml" />
-    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Negotiation\PreNegotiationQuestionnaire.cshtml" />
     <Content Include="Views\Negotiation\NegotiationTutorial.cshtml" />
     <Content Include="Views\Negotiation\Negotiation.cshtml" />
     <Content Include="Views\Negotiation\NegotiationSideView.cshtml" />
-    <Content Include="Views\Negotiation\NegotiationConfiguration.cshtml" />
+    <Content Include="Views\Negotiation\NegotiationDomainConfiguration.cshtml" />
     <Content Include="Views\Negotiation\_OfferView.cshtml" />
     <Content Include="Views\Negotiation\_ActionHistoryView.cshtml" />
     <Content Include="Views\Negotiation\NegotiationEndView.cshtml" />
     <Content Include="Views\Negotiation\NegotiationTimerView.cshtml" />
     <Content Include="Views\Negotiation\TutorialPresentationView.cshtml" />
+    <Content Include="Views\Negotiation\AllGameView.cshtml" />
+    <Content Include="Views\Negotiation\GameSummaryView.cshtml" />
+    <Content Include="Views\Negotiation\UserSummaryView.cshtml" />
+    <Content Include="Views\Negotiation\NegotiationStrategyConfiguration.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

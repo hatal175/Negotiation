@@ -18,6 +18,7 @@ namespace Negotiation.Models
         public UserType Type { get; set; }
         public string GameId { get; set; }
         public Nullable<int> StrategyId { get; set; }
+        public Nullable<int> Score { get; set; }
     
         public virtual UserRole UserRole { get; set; }
         public virtual Strategy Strategy { get; set; }

@@ -1,0 +1,87 @@
+﻿@using Negotiation.Models
+@model User
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>UserSummaryView</title>
+</head>
+<body>
+    <div> 
+        <h1>User @Model.Id Details</h1>
+
+       
+            <table border="1">
+                <tr>
+                    <th>
+                        User ID
+                    </th>
+                    <th>
+                        Role
+                    </th>
+                    <th>
+                        Variant
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    @if (Model.Type == UserType.Human)
+                    {
+                        <th>
+                            Gender
+                        </th>
+                        <th>
+                            Age Range
+                        </th>
+                        <th>
+                            Education
+                        </th>
+                        <th>
+                            Degree Field
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Student Id
+                        </th>
+                    }
+                    else
+                    {
+                        <th>
+                            Strategy Name
+                        </th>
+                    }
+                </tr>
+                <tr style="text-align:center">
+                    <td>@Model.Id</td>
+                    <td>@Model.UserRole.Description</td>
+                    <td>@Model.UserRole.Variant</td>
+                    <td>@Model.Type</td>
+                    @if (Model.Type == UserType.Human)
+                    {
+                        <td>@Model.UserData.Gender</td>
+                        <td>@Model.UserData.AgeRange.Description()</td>
+                        <td>@Model.UserData.Education.Description()</td>
+                        <td>@Model.UserData.DegreeField</td>
+                        <td>@Model.UserData.Country</td>
+                        <td>@Model.UserData.Name</td>
+                        <td>@Model.UserData.StudentId</td>
+                    }
+                    else
+                    {
+                        <td>@Model.Strategy.StrategyName</td>
+                    }
+                </tr>
+            </table>
+    </div>
+</body>
+</html>

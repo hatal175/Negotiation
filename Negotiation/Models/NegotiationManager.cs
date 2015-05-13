@@ -29,6 +29,23 @@ namespace Negotiation.Models
         public int StrategyId { get; set; }
     }
 
+    public class XmlFile
+    {
+        public String Name { get; set; }
+        public String Content { get; set; }
+
+        public XmlFile()
+        {
+
+        }
+
+        public XmlFile(string name, string content)
+        {
+            Name = name;
+            Content = content;
+        }
+    }
+
     public class NegotiationManager
     {
         public static ConcurrentDictionary<String, NegotiationEngine> OnGoingNegotiations { get; private set; }
@@ -60,7 +77,6 @@ namespace Negotiation.Models
                     OnGoingNegotiations.TryRemove(kvp.Key, out engine);
                 }
             }
-           
         }
 
         static public GameDomain GameDomain { get; set; }
@@ -70,11 +86,13 @@ namespace Negotiation.Models
         {
             GameDomain = new NegotiationContainer().GameDomainConfigSet.First().GameDomain;
 
-            Domain = new NegotiationDomain() {RoundLength = RoundLength, NumberOfRounds = TotalRounds };
+            NegotiationDomain domain = new NegotiationDomain() { RoundLength = RoundLength, NumberOfRounds = TotalRounds };
             XmlDocument doc = new XmlDocument();
             
             doc.LoadXml(GameDomain.DomainXML);
-            Domain.Extract(doc.ChildNodes[0]);
+            domain.Extract(doc.ChildNodes[0]);
+
+            Domain = domain;
         }
 
         static void SetActiveDomain(String domainName)
@@ -165,7 +183,8 @@ namespace Negotiation.Models
             cont.GameSet.Add(new Game()
                 {
                     Id = engine.NegotiationId,
-                    GameDomainId = GameDomain.Id
+                    GameDomainId = GameDomain.Id,
+                    StartTime = DateTime.Now
                 });
 
             cont.UserDataSet.Add(humanData);
@@ -236,5 +255,96 @@ namespace Negotiation.Models
 
             return example;
         }
+
+        internal static IEnumerable<Game> GetGames()
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            return cont.GameSet;
+        }
+
+        internal static object GetGame(string gameId)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            return cont.GameSet.Find(gameId);
+        }
+
+        internal static void SaveNegotiationEnd(String negotiationId, int humanScore, int agentScore, DateTime negotiationEndTime)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            var game = cont.GameSet.Find(negotiationId);
+
+            if (game == null) return;
+
+            game.Users.First(x => x.Type == UserType.Agent).Score = agentScore;
+            game.Users.First(x => x.Type == UserType.Human).Score = humanScore;
+            game.Endtime = negotiationEndTime;
+
+            cont.SaveChanges();
+        }
+
+        internal static object GetUser(string userId)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            return cont.UserSet.Find(userId);
+        }
+
+        internal static void SetNewDomain(int newActiveDomain)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            cont.GameDomainConfigSet.Remove(cont.GameDomainConfigSet.Find(GameDomain.Id));
+            cont.GameDomainConfigSet.Add(new GameDomainConfig() { Id = newActiveDomain });
+            cont.SaveChanges();
+
+            LoadDbData();
+        }
+
+        internal static void CreateDomain(string domainName, string domainXml, IEnumerable<XmlFile> variants)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+
+            var domainVariants = variants.Select(x => new DomainVariant() { Name = x.Name, VariantXML = x.Content }).ToList();
+            cont.DomainVariantSet.AddRange(domainVariants);
+
+            cont.GameDomainSet.Add(new GameDomain()
+                {
+                    Name = domainName,
+                    DomainXML = domainXml,
+                    DomainVariant = domainVariants
+                });
+
+            cont.SaveChanges();
+        }
+
+        public static IEnumerable<Models.GameDomain> GetDomains()
+        {
+            return new NegotiationContainer().GameDomainSet;
+        }
+
+        internal static void SetNewStrategy(int newActiveStrategy)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            cont.StrategyConfigSet.Remove(cont.StrategyConfigSet.Find(GetAiConfig().StrategyId));
+            cont.StrategyConfigSet.Add(new StrategyConfig() { Id = newActiveStrategy });
+            cont.SaveChanges();
+        }
+
+        internal static void CreateStrategy(string strategyName, string DllPath)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+
+            cont.StrategySet.Add(new Strategy()
+            {
+                StrategyName = strategyName,
+                DllPath = DllPath
+            });
+
+            cont.SaveChanges();
+        }
+
+        public static IEnumerable<Models.Strategy> GetStrategies()
+        {
+            return new NegotiationContainer().StrategySet;
+        }
+
     }
 }

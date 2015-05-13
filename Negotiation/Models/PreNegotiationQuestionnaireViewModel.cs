@@ -53,21 +53,6 @@ namespace Negotiation.Models
             }
         }
     }
-    
-    //public enum Education
-    //{
-    //    [Description("High School Education")]
-    //    TwelveYears,
-
-    //    [Description("Bachelor Degree")]
-    //    Bachelor,
-
-    //    [Description("Masters Degree")]
-    //    Masters,
-
-    //    [Description("Phd")]
-    //    Phd
-    //}
 
     public class PreNegotiationQuestionnaireViewModel
     {

@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Negotiation.Models;
 using System.Globalization;
 using Negotiation.App_Start;
+using System.IO;
 
 namespace Negotiation.Controllers
 {
@@ -273,19 +274,53 @@ namespace Negotiation.Controllers
             return PartialView("NegotiationTimerView", engine.Status.RemainingTime);
         }
 
-        public ActionResult NegotiationConfiguration()
+        public ActionResult NegotiationDomainConfiguration()
         {
-            return View();
+            return View(new NegotiationConfigurationModel<GameDomain>()
+                {
+                    ActiveId = NegotiationManager.GameDomain.Id,
+                    Items = NegotiationManager.GetDomains()
+                });
         }
 
-        public ActionResult NewActiveDomain(NegotiationConfigurationModel model)
+        public ActionResult NewActiveDomain(int newActiveDomain)
         {
-            if (NegotiationManager.GameDomain.Name != model.ActiveDomain)
+            if (NegotiationManager.GameDomain.Id != newActiveDomain)
             {
-
+                NegotiationManager.SetNewDomain(newActiveDomain);
             }
 
-            return View("NegotiationConfiguration");
+            return RedirectToAction("NegotiationDomainConfiguration");
+        }
+
+        [HttpPost]
+        public ActionResult UploadDomain(String domainName, HttpPostedFileBase domainXmlFile, IEnumerable<HttpPostedFileBase> variantFiles)
+        {
+            if (domainName == null || domainXmlFile == null || variantFiles == null) return RedirectToAction("NegotiationDomainConfiguration");
+
+            String domainXml;
+
+            if (domainXmlFile.ContentLength == 0)
+            {
+                return RedirectToAction("NegotiationDomainConfiguration");
+            }
+
+            using (StreamReader reader = new StreamReader(domainXmlFile.InputStream))
+            {
+                domainXml = reader.ReadToEnd();
+            }
+
+            var variants = variantFiles.Select(x =>
+                {
+                    using (StreamReader reader = new StreamReader(x.InputStream))
+                    {
+                        return new XmlFile(x.FileName,reader.ReadToEnd());
+                    }
+                });
+
+            NegotiationManager.CreateDomain(domainName, domainXml, variants);
+
+            return RedirectToAction("NegotiationDomainConfiguration");
         }
 
         public ActionResult NegotiationEnd(string negotiationId)
@@ -309,6 +344,89 @@ namespace Negotiation.Controllers
                     AiConfig = engine.AiConfig,
                     Domain = engine.Domain
                 });
+        }
+
+        public ActionResult AllGameView()
+        {
+            return View("AllGameView", NegotiationManager.GetGames());
+        }
+
+        public ActionResult GameSummary(string gameId)
+        {
+            if (String.IsNullOrEmpty(gameId))
+            {
+                return RedirectToAction("Negotiation");
+            }
+
+            var game = NegotiationManager.GetGame(gameId);
+
+            if (game == null)
+            {
+                return RedirectToAction("Negotiation");
+            }
+
+            return View("GameSummaryView", game);
+        }
+
+        public ActionResult UserSummary(string userId)
+        {
+            if (String.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Negotiation");
+            }
+
+            var user = NegotiationManager.GetUser(userId);
+
+            if (user == null)
+            {
+                return RedirectToAction("Negotiation");
+            }
+
+            return View("UserSummaryView", user);
+        }
+
+        public ActionResult NegotiationStrategyConfiguration()
+        {
+            return View(new NegotiationConfigurationModel<Strategy>()
+                {
+                    ActiveId = NegotiationManager.GetAiConfig().StrategyId,
+                    Items = NegotiationManager.GetStrategies()
+                });
+        }
+
+        public ActionResult NewActiveStrategy(int newActiveStrategy)
+        {
+            if (newActiveStrategy == 0) return RedirectToAction("NegotiationStrategyConfiguration");
+
+            if (NegotiationManager.GetAiConfig().StrategyId != newActiveStrategy)
+            {
+                NegotiationManager.SetNewStrategy(newActiveStrategy);
+            }
+
+            return RedirectToAction("NegotiationStrategyConfiguration");
+        }
+
+        [HttpPost]
+        public ActionResult UploadStrategy(String strategyName, HttpPostedFileBase strategyDll)
+        {
+            if (strategyName == null || strategyDll == null) return RedirectToAction("NegotiationStrategyConfiguration");
+
+            if (strategyDll.ContentLength == 0)
+            {
+                return RedirectToAction("NegotiationStrategyConfiguration");
+            }
+
+            String virtualPath = Path.Combine("~/Dlls", DateTime.Now.ToString("YYMMDD.hh.mm.ss.") + strategyDll.FileName);
+            String DllPath = System.Web.HttpContext.Current.Server.MapPath(virtualPath);
+
+            using (FileStream fs = new FileStream(DllPath, FileMode.CreateNew))
+            {
+                strategyDll.InputStream.CopyTo(fs);
+            }
+
+            NegotiationManager.CreateStrategy(strategyName, virtualPath);
+
+            return RedirectToAction("NegotiationStrategyConfiguration");
         }
     }
 }

@@ -1,0 +1,28 @@
+﻿@using Negotiation.Models
+@model NegotiationConfigurationModel<Strategy>
+@{
+    ViewBag.Title = "NegotiationStrategyConfiguration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Upload Strategy</h1>
+@using (Html.BeginForm("UploadStrategy", "Negotiation", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>
+        Enter strategy name: @Html.TextBox("strategyName") <br /><br />
+        Choose Strategy DLL file: <input type="file" name="strategyDll" /> <br />
+    </div>
+    <input type="submit" class="btn btn-default" value="Upload Strategy" />
+}
+
+<h1>Set New Active Strategy</h1>
+@if (@NegotiationManager.GetStrategies().Any())
+{
+    using (Html.BeginForm("NewActiveStrategy", "Negotiation", FormMethod.Post))
+    {
+        <h2>Active Domain:</h2>
+        @Html.DropDownList("newActiveStrategy", Model.Items.Select(x => new SelectListItem { Text = x.StrategyName, Value = x.Id.ToString(), Selected = (x.Id == Model.ActiveId) }));
+
+    <input type="submit" class="btn btn-default" value="Set Active Strategy" />
+    }
+}

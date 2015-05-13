@@ -11,7 +11,6 @@
     <EntitySet Name="UserRoleSet" EntityType="Negotiation.Store.UserRoleSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="GameSet" EntityType="Negotiation.Store.GameSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="GameDomainSet" EntityType="Negotiation.Store.GameDomainSet" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="UserResultSet" EntityType="Negotiation.Store.UserResultSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="StrategySet" EntityType="Negotiation.Store.StrategySet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DomainVariantSet" EntityType="Negotiation.Store.DomainVariantSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="GameDomainConfigSet" EntityType="Negotiation.Store.GameDomainConfigSet" store:Type="Tables" Schema="dbo" />
@@ -36,10 +35,6 @@
     <AssociationSet Name="GameGameDomain" Association="Negotiation.Store.GameGameDomain">
       <End Role="Game" EntitySet="GameSet" />
       <End Role="GameDomain" EntitySet="GameDomainSet" />
-    </AssociationSet>
-    <AssociationSet Name="GameUserResult" Association="Negotiation.Store.GameUserResult">
-      <End Role="Game" EntitySet="GameSet" />
-      <End Role="UserResult" EntitySet="UserResultSet" />
     </AssociationSet>
     <AssociationSet Name="UserStrategy" Association="Negotiation.Store.UserStrategy">
       <End Role="User" EntitySet="UserSet" />
@@ -81,6 +76,7 @@
     <Property Name="Type" Type="tinyint" Nullable="false" />
     <Property Name="GameId" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="StrategyId" Type="int" Nullable="true" />
+    <Property Name="Score" Type="int" Nullable="true" />
     <Property Name="UserRole_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="UserRoleSet">
@@ -97,6 +93,8 @@
     </Key>
     <Property Name="Id" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="GameDomainId" Type="int" Nullable="false" />
+    <Property Name="StartTime" Type="datetime" Nullable="false" />
+    <Property Name="Endtime" Type="datetime" Nullable="true" />
   </EntityType>
   <EntityType Name="GameDomainSet">
     <Key>
@@ -105,14 +103,6 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="DomainXML" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-  </EntityType>
-  <EntityType Name="UserResultSet">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="GameId" Type="nvarchar" Nullable="false" MaxLength="255" />
-    <Property Name="UserScore" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="StrategySet">
     <Key>
@@ -218,18 +208,6 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="GameUserResult">
-    <End Role="Game" Type="Negotiation.Store.GameSet" Multiplicity="1" />
-    <End Role="UserResult" Type="Negotiation.Store.UserResultSet" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Game">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="UserResult">
-        <PropertyRef Name="GameId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="UserStrategy">
     <End Role="User" Type="Negotiation.Store.UserSet" Multiplicity="*" />
     <End Role="Strategy" Type="Negotiation.Store.StrategySet" Multiplicity="0..1" />
@@ -320,11 +298,6 @@
             <End Role="Game" EntitySet="GameSet" />
             <End Role="GameDomain" EntitySet="GameDomainSet" />
           </AssociationSet>
-          <EntitySet Name="UserResultSet" EntityType="Negotiation.UserResult" />
-          <AssociationSet Name="GameUserResult" Association="Negotiation.GameUserResult">
-            <End Role="Game" EntitySet="GameSet" />
-            <End Role="UserResult" EntitySet="UserResultSet" />
-          </AssociationSet>
           <EntitySet Name="StrategySet" EntityType="Negotiation.Strategy" />
           <AssociationSet Name="UserStrategy" Association="Negotiation.UserStrategy">
             <End EntitySet="UserSet" Role="User" />
@@ -384,6 +357,7 @@
           <NavigationProperty Name="UserData" Relationship="Negotiation.UserUserData" FromRole="User" ToRole="UserData" />
           <Property Name="GameId" Type="String" Nullable="false" MaxLength="255" />
           <Property Name="StrategyId" Type="Int32" Nullable="true" />
+          <Property Name="Score" Type="Int32" Nullable="true" />
         </EntityType>
         <Association Name="NegotiationActionUserId">
           <End Type="Negotiation.NegotiationAction" Role="NegotiationAction" Multiplicity="*" />
@@ -417,8 +391,9 @@
           <NavigationProperty Name="Users" Relationship="Negotiation.GameUser" FromRole="Game" ToRole="User" />
           <NavigationProperty Name="NegotiationActions" Relationship="Negotiation.GameNegotiationAction" FromRole="Game" ToRole="NegotiationAction" />
           <NavigationProperty Name="GameDomain" Relationship="Negotiation.GameGameDomain" FromRole="Game" ToRole="GameDomain" />
-          <NavigationProperty Name="UserResult" Relationship="Negotiation.GameUserResult" FromRole="Game" ToRole="UserResult" />
           <Property Name="GameDomainId" Type="Int32" Nullable="false" />
+          <Property Name="StartTime" Type="DateTime" Nullable="false" />
+          <Property Name="Endtime" Type="DateTime" Nullable="true" />
         </EntityType>
         <Association Name="GameUser">
           <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
@@ -462,26 +437,6 @@
             </Principal>
             <Dependent Role="Game">
               <PropertyRef Name="GameDomainId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="UserResult">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="GameId" Type="String" Nullable="false" MaxLength="255" />
-          <Property Name="UserScore" Type="Int32" Nullable="false" />
-        </EntityType>
-        <Association Name="GameUserResult">
-          <End Type="Negotiation.Game" Role="Game" Multiplicity="1" />
-          <End Type="Negotiation.UserResult" Role="UserResult" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Game">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="UserResult">
-              <PropertyRef Name="GameId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -626,6 +581,7 @@
           <ScalarProperty Name="Type" ColumnName="Type" />
           <ScalarProperty Name="GameId" ColumnName="GameId" />
           <ScalarProperty Name="StrategyId" ColumnName="StrategyId" />
+          <ScalarProperty Name="Score" ColumnName="Score" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -643,6 +599,8 @@
         <MappingFragment StoreEntitySet="GameSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="GameDomainId" ColumnName="GameDomainId" />
+          <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+          <ScalarProperty Name="Endtime" ColumnName="Endtime" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -652,15 +610,6 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="DomainXML" ColumnName="DomainXML" />
           <ScalarProperty Name="Name" ColumnName="Name" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
-    <EntitySetMapping Name="UserResultSet">
-      <EntityTypeMapping TypeName="IsTypeOf(Negotiation.UserResult)">
-        <MappingFragment StoreEntitySet="UserResultSet">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="GameId" ColumnName="GameId" />
-          <ScalarProperty Name="UserScore" ColumnName="UserScore" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -754,14 +703,12 @@
         <EntityTypeShape EntityType="Negotiation.UserRole" Width="1.5" PointX="7.5" PointY="3.875" IsExpanded="true" />
         <EntityTypeShape EntityType="Negotiation.Game" Width="1.5" PointX="0.75" PointY="5.875" IsExpanded="true" />
         <EntityTypeShape EntityType="Negotiation.GameDomain" Width="1.5" PointX="3" PointY="10.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Negotiation.UserResult" Width="1.5" PointX="3" PointY="12.875" IsExpanded="true" />
         <EntityTypeShape EntityType="Negotiation.Strategy" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <AssociationConnector Association="Negotiation.NegotiationActionUserId" ManuallyRouted="false" />
         <AssociationConnector Association="Negotiation.UserUserRole" ManuallyRouted="false" />
         <AssociationConnector Association="Negotiation.GameUser" ManuallyRouted="false" />
         <AssociationConnector Association="Negotiation.GameNegotiationAction" ManuallyRouted="false" />
         <AssociationConnector Association="Negotiation.GameGameDomain" ManuallyRouted="false" />
-        <AssociationConnector Association="Negotiation.GameUserResult" ManuallyRouted="false" />
         <AssociationConnector ManuallyRouted="false" Association="Negotiation.UserStrategy" />
         <EntityTypeShape EntityType="Negotiation.DomainVariant" Width="1.5" PointX="5.75" PointY="10.875" />
         <AssociationConnector Association="Negotiation.GameDomainDomainVariant" />

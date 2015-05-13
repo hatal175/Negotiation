@@ -30,7 +30,6 @@ namespace Negotiation.Models
         public virtual DbSet<UserRole> UserRoleSet { get; set; }
         public virtual DbSet<Game> GameSet { get; set; }
         public virtual DbSet<GameDomain> GameDomainSet { get; set; }
-        public virtual DbSet<UserResult> UserResultSet { get; set; }
         public virtual DbSet<Strategy> StrategySet { get; set; }
         public virtual DbSet<DomainVariant> DomainVariantSet { get; set; }
         public virtual DbSet<GameDomainConfig> GameDomainConfigSet { get; set; }

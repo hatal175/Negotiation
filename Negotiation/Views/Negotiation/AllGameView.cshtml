@@ -1,0 +1,49 @@
+﻿@using Negotiation.Models
+@model IEnumerable<Game>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Games</title>
+</head>
+<body>
+    <div>
+        <h1>Game List</h1>
+
+        <table border="1">
+            <tr>
+                <th>
+                    Game ID
+                </th>
+                <th>
+                    Game Domain
+                </th>
+                <th>
+                    Strategy
+                </th>
+                <th>
+                    Start Time
+                </th>
+                <th>
+                    End Time
+                </th>
+            </tr>
+            @foreach (var game in Model.OrderBy(x=>x.StartTime))
+            {
+                <tr style="text-align:center">
+                    <td>@Html.ActionLink(game.Id.ToString(),"GameSummary",new{gameId = game.Id})</td>
+                    <td>@game.GameDomain.Name</td>
+                    <td>@game.Users.First(user => user.Type == UserType.Agent).Strategy.StrategyName</td>
+                    <td>@game.StartTime</td>
+                    <td>@game.Endtime</td>
+                </tr>
+            }
+        </table>
+    </div>
+</body>
+</html>

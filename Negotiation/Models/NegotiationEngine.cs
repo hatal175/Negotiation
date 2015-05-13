@@ -123,15 +123,19 @@ namespace Negotiation.Models
         void channel_OfferAcceptedEvent(object sender, EventArgs e)
         {
             NegotiationOffer offer;
+            SideConfig acceptingConfig;
             if (sender == AiChannel)
             {
                 Status.State = NegotiationState.EndHumanOfferAccepted;
                 offer = Status.HumanStatus.Offer;
+                acceptingConfig = AiConfig;
+
             }
             else
             {
                 Status.State = NegotiationState.EndAiOfferAccepted;
                 offer = Status.AiStatus.Offer;
+                acceptingConfig = HumanConfig;
             }
 
             Status.HumanStatus.Score = CalculateAcceptScore(HumanConfig, offer);
@@ -147,6 +151,8 @@ namespace Negotiation.Models
                 Role = (((INegotiationChannel)sender) == AiChannel) ? AiConfig.Side : HumanConfig.Side,
                 Type = NegotiationActionType.AcceptOffer
             });
+
+            NegotiationManager.SaveOfferAccepted(this, acceptingConfig);
 
             EndNegotiation();
         }
@@ -220,6 +226,8 @@ namespace Negotiation.Models
 
             UnregisterChannel(HumanChannel);
             UnregisterChannel(AiChannel);
+
+            NegotiationManager.SaveNegotiationEnd(NegotiationId, Status.HumanStatus.Score, Status.AiStatus.Score, DateTime.Now);
         }
 
         void _timer_Elapsed(object sender, ElapsedEventArgs e)

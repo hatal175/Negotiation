@@ -1,0 +1,96 @@
+﻿@using Negotiation.Models
+@model Game
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Game Summary</title>
+</head>
+<body>
+    <div>
+        <h1>Game @Model.Id of Domain @Model.GameDomain.Name</h1>
+
+        <h2>User Info</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>
+                        User Id
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        Role
+                    </th>
+                    <th>
+                        Variant
+                    </th>
+                    <th>
+                        Score
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+
+                            <td>@Html.ActionLink(user.Id, "UserSummary", new {userId = user.Id})</td>
+                            <td>@user.Type</td>
+                            <td>@user.UserRole.Description</td>
+                            <td>@user.UserRole.Variant</td>
+                            <td>@user.Score</td>
+                        </tr>
+                    }
+            </tbody>
+        </table>
+        <br />
+        <br />
+        <h2>Game Action List</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>
+                        Action
+                    </th>
+                    <th>
+                        Remaining Time
+                    </th>
+                    <th>
+                        Role
+                    </th>
+                    <th>
+                        Variant
+                    </th>
+                    <th>
+                        User Id
+                    </th>
+                    <th>
+                        Value
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    @foreach (var action in Model.NegotiationActions)
+                    {
+                        <tr>
+                            <td>@action.Type</td>
+                            <td>@action.RemainingTime</td>
+                            <td>@action.User.UserRole.Description</td>
+                            <td>@action.User.UserRole.Variant</td>
+                            <td>@action.UserId</td>
+                            <td>@action.Value</td>
+                        </tr>
+                    }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
