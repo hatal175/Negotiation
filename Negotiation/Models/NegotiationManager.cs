@@ -213,7 +213,7 @@ namespace Negotiation.Models
             cont.NegotiationActionSet.Add(new NegotiationAction()
             {
                 GameId = engine.NegotiationId,
-                Type = NegotiationActionType.MakeOffer,
+                Type = type,
                 User = user,
                 RemainingTime = engine.Status.RemainingTime,
                 UserId = user.Id,
@@ -346,5 +346,10 @@ namespace Negotiation.Models
             return new NegotiationContainer().StrategySet;
         }
 
+
+        internal static void SaveUserOptionChange(NegotiationEngine engine, string topic, string option)
+        {
+            SaveAction(engine, engine.HumanConfig, NegotiationActionType.MakeChange, String.Format("{{\"{0}\":\"{1}\"}}",topic,option));
+        }
     }
 }

@@ -247,7 +247,7 @@ namespace Negotiation.Controllers
 
             if (!engine.NegotiationActive) return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
 
-            return PartialView("_ActionHistoryView", engine.Actions);
+            return PartialView("_ActionHistoryView", engine.Actions.Where(action => action.Type != NegotiationActionType.MakeChange));
         }
 
         public ActionResult OptOut(String negotiationId)
@@ -427,6 +427,17 @@ namespace Negotiation.Controllers
             NegotiationManager.CreateStrategy(strategyName, virtualPath);
 
             return RedirectToAction("NegotiationStrategyConfiguration");
+        }
+
+        public ActionResult SaveUserOptionChange(String negotiationId, String topic, String option)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            NegotiationManager.SaveUserOptionChange(engine, topic, option);
+
+            return new HttpStatusCodeResult(System.Net.HttpStatusCode.OK);
         }
     }
 }
