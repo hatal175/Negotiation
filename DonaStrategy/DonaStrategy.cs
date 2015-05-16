@@ -14,6 +14,7 @@ namespace DonaStrategy
         private Dictionary<string, OfferUtility> m_bestCombinedUtilityOffers;
         private Dictionary<string, OfferUtility> m_bestFScoreUtilityOffers;
         private NegotiationOffer m_currentOffer;
+        private NegotiationOffer m_opponentOffer;
 
         private Dictionary<NegotiationOffer, OfferUtility> m_allOptions;
 
@@ -43,7 +44,7 @@ namespace DonaStrategy
             CalculateOffers();
         }
 
-        double CalculateUtility(IEnumerable<KeyValuePair<String,String>> offer, SideConfig config)
+        double CalculateUtility(IEnumerable<KeyValuePair<String, String>> offer, SideConfig config)
         {
             var sideDesc = Domain.GetSideDescription(config);
             return offer.Aggregate(0.0, (sum, x) => sum + sideDesc.Topics[x.Key].Options[x.Value].Score);
@@ -55,11 +56,11 @@ namespace DonaStrategy
             {
                 Offer = new NegotiationOffer(offer),
                 Utility = CalculateUtility(offer, StrategyConfig),
-                UtilityDataDict = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(x=>x,variantName => new UtilityData()
+                UtilityDataDict = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(x => x, variantName => new UtilityData()
                 {
                     OpponentUtility = CalculateUtility(offer, new SideConfig(OpponentSide, variantName))
                 })
-            }).ToDictionary(x=>x.Offer);
+            }).ToDictionary(x => x.Offer);
 
             double maxUtility = m_allOptions.Values.Max(x => x.Utility);
             Dictionary<string, double> maxOpponentDict = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(x => x, variantName => m_allOptions.Values.Select(x => x.UtilityDataDict[variantName].OpponentUtility).Max());
@@ -67,8 +68,8 @@ namespace DonaStrategy
             foreach (var option in m_allOptions.Values)
             {
                 option.Utility /= maxUtility;
-                
-                foreach(var key in option.UtilityDataDict.Keys)
+
+                foreach (var key in option.UtilityDataDict.Keys)
                 {
                     var utilityData = option.UtilityDataDict[key];
                     utilityData.OpponentUtility /= maxOpponentDict[key];
@@ -97,31 +98,66 @@ namespace DonaStrategy
         void Client_TimePassedEvent(object sender, TimePassedEventArgs e)
         {
             int roundsPassed = Domain.RoundsPassed(e.RemainingTime);
-            if (roundsPassed == m_roundsPassed)
+            if (roundsPassed == m_roundsPassed && roundsPassed != Domain.NumberOfRounds - 1)
+            {
                 return;
-
-            if (roundsPassed < m_bestCombinedUtilityOffers.Count)
-            {
-                SendOffer(m_bestCombinedUtilityOffers.Values.ElementAt(roundsPassed - 1).Offer);
-            }
-            else if (roundsPassed < m_bestCombinedUtilityOffers.Count + m_bestFScoreUtilityOffers.Count)
-            {
-                SendOffer(m_bestFScoreUtilityOffers.Values.ElementAt(roundsPassed - m_bestCombinedUtilityOffers.Count - 1).Offer);
             }
 
             m_roundsPassed = roundsPassed;
+               
+            if (roundsPassed == 0) 
+            {
+                return;
+            }
+            else if (roundsPassed < Domain.NumberOfRounds - 1)
+            {
+                CompareOffer(m_opponentOffer);
+                SendOffer(m_bestFScoreUtilityOffers.Values.ElementAt(roundsPassed % m_bestFScoreUtilityOffers.Count).Offer);
+            }
+            else 
+            {
+                CompareOffer(m_opponentOffer);
+                int roundPart = (int)(Domain.RoundLength.TotalSeconds / Domain.OwnerVariantDict[this.OpponentSide].Count);
+                int offerIndex = Math.Min(m_bestCombinedUtilityOffers.Count - 1, ((int)e.RemainingTime.TotalSeconds) / roundPart);
+                NegotiationOffer offer = m_bestCombinedUtilityOffers.Values.ElementAt(offerIndex).Offer;
+                SendOffer(offer);
+            }
         }
 
         void Client_OfferReceivedEvent(object sender, OfferEventArgs e)
         {
+            m_opponentOffer = e.Offer;
+
             if (m_currentOffer == null)
             {
                 return;
             }
 
-            if (m_allOptions[e.Offer].Utility >= m_allOptions[m_currentOffer].Utility)
+            CompareOffer(e.Offer);
+        }
+
+        private void CompareOffer(NegotiationOffer offer)
+        {
+            if (m_roundsPassed == 0)
             {
-                Client.AcceptOffer();
+                if (offer == m_currentOffer)
+                {
+                    Client.AcceptOffer();
+                }
+            }
+            else if (m_roundsPassed < Domain.NumberOfRounds - 1)
+            {
+                if (m_allOptions[offer].Utility >= m_bestFScoreUtilityOffers.Values.Select(x => x.Utility).Min())
+                {
+                    Client.AcceptOffer();
+                }
+            }
+            else
+            {
+                if (m_allOptions[offer].Utility >= m_bestCombinedUtilityOffers.Values.Select(x => x.Utility).Min())
+                {
+                    Client.AcceptOffer();
+                }
             }
         }
 

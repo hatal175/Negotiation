@@ -26,16 +26,16 @@ namespace Negotiation.Controllers
 
         public ActionResult SubmitUserData(PreNegotiationQuestionnaireViewModel model)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return View("PreNegotiationQuestionnaire", model);
-            //}
+            if (!ModelState.IsValid)
+            {
+                return View("PreNegotiationQuestionnaire", model);
+            }
 
-            //if (!model.AgreeIRB)
-            //{
-            //    ModelState.AddModelError("AgreeIRB", "Please agree to the IRB form");
-            //    return View("PreNegotiationQuestionnaire", model);
-            //}
+            if (!model.AgreeIRB)
+            {
+                ModelState.AddModelError("AgreeIRB", "Please agree to the IRB form");
+                return View("PreNegotiationQuestionnaire", model);
+            }
 
             String id = CreateNewNegotiation(model);
 
@@ -80,7 +80,7 @@ namespace Negotiation.Controllers
 
             NegotiationSideDescription desc = engine.Domain.OwnerVariantDict[config.Side][config.Variant];
 
-            int optoutend = (desc.Optout + desc.TimeEffect * NegotiationManager.TotalRounds);
+            int optoutend = engine.Domain.CalculateOptoutScore(config, NegotiationManager.TotalRounds);
 
             return new NegotiationTutorialModel
             {
@@ -138,10 +138,10 @@ namespace Negotiation.Controllers
                 return RedirectToAction("Negotiation");
             }
 
-            //if (!model.Questions.Select(x => x.Answer).SequenceEqual(NegotiationManager.TutorialModels[model.TutorialId].Questions.Select(x => x.ActualAnswer)))
-            //{
-            //    return View("NegotiationTutorial", NegotiationManager.TutorialModels[model.TutorialId]);
-            //}
+            if (!model.Questions.Select(x => x.Answer).SequenceEqual(NegotiationManager.TutorialModels[model.TutorialId].Questions.Select(x => x.ActualAnswer)))
+            {
+                return View("NegotiationTutorial", NegotiationManager.TutorialModels[model.TutorialId]);
+            }
 
             NegotiationTutorialModel temp;
             NegotiationManager.TutorialModels.TryRemove(model.TutorialId, out temp);
