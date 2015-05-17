@@ -29,6 +29,11 @@ namespace Negotiation.Models
             return (other != null && Offers.Count == other.Offers.Count && !Offers.Except(other.Offers).Any());
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj != null && Equals(obj as NegotiationOffer);
+        }
+
         public override int GetHashCode()
         {
             return Offers.Aggregate(0, (x, y) => x ^ y.GetHashCode());

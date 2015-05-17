@@ -145,7 +145,7 @@ namespace DonaStrategy
 
             if (m_roundsPassed == 0)
             {
-                if (offer == m_currentOffer)
+                if (offer.Equals(m_currentOffer))
                 {
                     Client.AcceptOffer();
                 }

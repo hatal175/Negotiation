@@ -426,7 +426,7 @@ namespace Negotiation.Controllers
                 return RedirectToAction("NegotiationStrategyConfiguration");
             }
 
-            String virtualPath = Path.Combine("~/Dlls", DateTime.Now.ToString("YYMMDD.hh.mm.ss.") + strategyDll.FileName);
+            String virtualPath = Path.Combine("~/Dlls", DateTime.Now.ToString("yyyyMMdd.hh.mm.ss.") + strategyDll.FileName);
             String DllPath = System.Web.HttpContext.Current.Server.MapPath(virtualPath);
 
             using (FileStream fs = new FileStream(DllPath, FileMode.CreateNew))
