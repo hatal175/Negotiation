@@ -126,6 +126,10 @@
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="AiSide" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="AiVariant" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="HumanSide" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="HumanVariant" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="UserDataSet">
     <Key>
@@ -491,6 +495,10 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="None" />
           <NavigationProperty Name="GameDomain" Relationship="Negotiation.GameDomainConfigGameDomain" FromRole="GameDomainConfig" ToRole="GameDomain" />
+          <Property Name="AiSide" Type="String" Nullable="false" />
+          <Property Name="AiVariant" Type="String" Nullable="false" />
+          <Property Name="HumanSide" Type="String" Nullable="false" />
+          <Property Name="HumanVariant" Type="String" Nullable="false" />
         </EntityType>
         <Association Name="GameDomainConfigGameDomain">
           <End Type="Negotiation.GameDomainConfig" Role="GameDomainConfig" Multiplicity="1" />
@@ -636,6 +644,10 @@
       <EntityTypeMapping TypeName="IsTypeOf(Negotiation.GameDomainConfig)">
         <MappingFragment StoreEntitySet="GameDomainConfigSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AiSide" ColumnName="AiSide" />
+          <ScalarProperty Name="AiVariant" ColumnName="AiVariant" />
+          <ScalarProperty Name="HumanSide" ColumnName="HumanSide" />
+          <ScalarProperty Name="HumanVariant" ColumnName="HumanVariant" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -712,7 +724,7 @@
         <AssociationConnector ManuallyRouted="false" Association="Negotiation.UserStrategy" />
         <EntityTypeShape EntityType="Negotiation.DomainVariant" Width="1.5" PointX="5.75" PointY="10.875" />
         <AssociationConnector Association="Negotiation.GameDomainDomainVariant" />
-        <EntityTypeShape EntityType="Negotiation.GameDomainConfig" Width="1.5" PointX="3.375" PointY="8.5" />
+        <EntityTypeShape EntityType="Negotiation.GameDomainConfig" Width="1.5" PointX="3.375" PointY="7.625" />
         <AssociationConnector Association="Negotiation.GameDomainConfigGameDomain" />
         <EntityTypeShape EntityType="Negotiation.UserData" Width="1.5" PointX="10.125" PointY="5.25" />
         <AssociationConnector Association="Negotiation.UserUserData" />

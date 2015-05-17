@@ -10,4 +10,11 @@ namespace Negotiation.Models
         public IEnumerable<T> Items { get; set; }
         public int ActiveId { get; set; }
     }
+
+    public class NegotiationDomainConfig : NegotiationConfigurationModel<GameDomain>
+    {
+        public String HumanSide { get; set; }
+        public String AiVariant { get; set; }
+        public String HumanVariant { get; set; }
+    }
 }

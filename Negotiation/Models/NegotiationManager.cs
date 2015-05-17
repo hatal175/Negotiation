@@ -81,34 +81,38 @@ namespace Negotiation.Models
 
         static public GameDomain GameDomain { get; set; }
         public static NegotiationDomain Domain { get; private set; }
+        static public GameDomainConfig Config { get; set; }
 
         static void LoadDbData()
         {
-            GameDomain = new NegotiationContainer().GameDomainConfigSet.First().GameDomain;
+            var domainConfig = new NegotiationContainer().GameDomainConfigSet.FirstOrDefault();
 
+            if (domainConfig != null)
+            {
+                Config = domainConfig;
+                GameDomain = domainConfig.GameDomain;
+
+                LoadDomain();
+            }
+        }
+
+        private static void LoadDomain()
+        {
             NegotiationDomain domain = new NegotiationDomain() { RoundLength = RoundLength, NumberOfRounds = TotalRounds };
             XmlDocument doc = new XmlDocument();
-            
+
             doc.LoadXml(GameDomain.DomainXML);
             domain.Extract(doc.ChildNodes[0]);
 
             Domain = domain;
         }
 
-        static void SetActiveDomain(String domainName)
-        {
-            NegotiationContainer cont = new NegotiationContainer();
-            GameDomain domain = cont.GameDomainSet.First(x => x.Name == domainName);
-            cont.GameDomainConfigSet.First().GameDomain = domain;
-            cont.SaveChanges();
-        }
-
         public static SideConfig GetHumanConfig()
         {
             return new SideConfig 
             { 
-                Side = Domain.OwnerVariantDict.Keys.First(), 
-                Variant = Domain.OwnerVariantDict.Values.First().Keys.First() , 
+                Side = Config.HumanSide, 
+                Variant = Config.HumanVariant, 
                 Type = UserType.Human
             };
         }
@@ -116,14 +120,15 @@ namespace Negotiation.Models
         public static AiConfig GetAiConfig()
         {
             NegotiationContainer cont = new NegotiationContainer();
-            var strat = cont.StrategyConfigSet.First();
+            var gameConfig = cont.GameDomainConfigSet.First();
+            var strat = cont.StrategyConfigSet.FirstOrDefault();
 
             return new AiConfig
             {
-                Side = Domain.OwnerVariantDict.Keys.ElementAt(1), 
-                Variant = Domain.OwnerVariantDict.Values.ElementAt(1).Keys.First(), 
+                Side = gameConfig.AiSide,
+                Variant = gameConfig.AiVariant, 
                 Type = UserType.Agent,
-                StrategyId = strat.Id
+                StrategyId = strat != null ? strat.Id : 0
             };
         }
 
@@ -291,10 +296,42 @@ namespace Negotiation.Models
         internal static void SetNewDomain(int newActiveDomain)
         {
             NegotiationContainer cont = new NegotiationContainer();
-            cont.GameDomainConfigSet.Remove(cont.GameDomainConfigSet.Find(GameDomain.Id));
-            cont.GameDomainConfigSet.Add(new GameDomainConfig() { Id = newActiveDomain });
-            cont.SaveChanges();
 
+            if (GameDomain != null)
+            {
+                var activeConfig = cont.GameDomainConfigSet.Find(GameDomain.Id);
+                if (activeConfig != null)
+                {
+                    cont.GameDomainConfigSet.Remove(activeConfig);
+                }
+            }
+
+            GameDomain = cont.GameDomainSet.Find(newActiveDomain);
+            LoadDomain();
+            
+            string humanSide = Domain.OwnerVariantDict.Keys.First();
+            string aiSide = Domain.OwnerVariantDict.Keys.ElementAt(1);
+
+            Config = new GameDomainConfig()
+            {
+                Id = newActiveDomain,
+                HumanSide = humanSide,
+                HumanVariant = Domain.OwnerVariantDict[humanSide].Keys.First(),
+                AiSide = aiSide,
+                AiVariant = Domain.OwnerVariantDict[aiSide].Keys.First()
+            };
+
+            cont.GameDomainConfigSet.Add(Config);
+
+            try
+            {
+                cont.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            
             LoadDbData();
         }
 
@@ -313,6 +350,11 @@ namespace Negotiation.Models
                 });
 
             cont.SaveChanges();
+
+            if (GameDomain == null)
+            {
+                SetNewDomain(cont.GameDomainSet.First().Id);
+            }
         }
 
         public static IEnumerable<Models.GameDomain> GetDomains()
@@ -323,7 +365,13 @@ namespace Negotiation.Models
         internal static void SetNewStrategy(int newActiveStrategy)
         {
             NegotiationContainer cont = new NegotiationContainer();
-            cont.StrategyConfigSet.Remove(cont.StrategyConfigSet.Find(GetAiConfig().StrategyId));
+            
+            var stratId = GetAiConfig().StrategyId;
+            if (stratId != 0)
+            {
+                cont.StrategyConfigSet.Remove(cont.StrategyConfigSet.Find(stratId));
+            }
+            
             cont.StrategyConfigSet.Add(new StrategyConfig() { Id = newActiveStrategy });
             cont.SaveChanges();
         }
@@ -339,6 +387,11 @@ namespace Negotiation.Models
             });
 
             cont.SaveChanges();
+
+            if (!cont.StrategyConfigSet.Any())
+            {
+                SetNewStrategy(cont.StrategySet.First().Id);
+            }
         }
 
         public static IEnumerable<Models.Strategy> GetStrategies()
@@ -346,10 +399,24 @@ namespace Negotiation.Models
             return new NegotiationContainer().StrategySet;
         }
 
-
         internal static void SaveUserOptionChange(NegotiationEngine engine, string topic, string option)
         {
             SaveAction(engine, engine.HumanConfig, NegotiationActionType.MakeChange, String.Format("{{\"{0}\":\"{1}\"}}",topic,option));
+        }
+
+        internal static void SetDomainVariants(string humanSide, string humanVariant, string aiVariant)
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            var domainConfig = new NegotiationContainer().GameDomainConfigSet.First();
+
+            domainConfig.HumanSide = humanSide;
+            domainConfig.HumanVariant = humanVariant;
+            domainConfig.AiSide = Domain.OwnerVariantDict.Keys.Except(humanSide).First();
+            domainConfig.AiVariant = aiVariant;
+
+            cont.SaveChanges();
+
+            Config = domainConfig;
         }
     }
 }

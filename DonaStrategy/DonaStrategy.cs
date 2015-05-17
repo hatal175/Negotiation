@@ -138,6 +138,11 @@ namespace DonaStrategy
 
         private void CompareOffer(NegotiationOffer offer)
         {
+            if (offer == null)
+            {
+                return;
+            }
+
             if (m_roundsPassed == 0)
             {
                 if (offer == m_currentOffer)
@@ -147,14 +152,14 @@ namespace DonaStrategy
             }
             else if (m_roundsPassed < Domain.NumberOfRounds - 1)
             {
-                if (m_allOptions[offer].Utility >= m_bestFScoreUtilityOffers.Values.Select(x => x.Utility).Min())
+                if (m_allOptions[offer].Utility >= m_bestFScoreUtilityOffers.Values.Min(x => x.Utility))
                 {
                     Client.AcceptOffer();
                 }
             }
             else
             {
-                if (m_allOptions[offer].Utility >= m_bestCombinedUtilityOffers.Values.Select(x => x.Utility).Min())
+                if (m_allOptions[offer].Utility >= m_bestCombinedUtilityOffers.Values.Min(x => x.Utility))
                 {
                     Client.AcceptOffer();
                 }

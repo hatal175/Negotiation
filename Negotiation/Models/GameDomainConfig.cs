@@ -15,6 +15,10 @@ namespace Negotiation.Models
     public partial class GameDomainConfig
     {
         public int Id { get; set; }
+        public string AiSide { get; set; }
+        public string AiVariant { get; set; }
+        public string HumanSide { get; set; }
+        public string HumanVariant { get; set; }
     
         public virtual GameDomain GameDomain { get; set; }
     }

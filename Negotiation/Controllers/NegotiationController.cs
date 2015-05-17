@@ -276,19 +276,29 @@ namespace Negotiation.Controllers
 
         public ActionResult NegotiationDomainConfiguration()
         {
-            return View(new NegotiationConfigurationModel<GameDomain>()
+            return View(new NegotiationDomainConfig()
                 {
-                    ActiveId = NegotiationManager.GameDomain.Id,
-                    Items = NegotiationManager.GetDomains()
+                    ActiveId = NegotiationManager.GameDomain != null ? NegotiationManager.GameDomain.Id : 0,
+                    Items = NegotiationManager.GetDomains(),
+                    HumanSide = NegotiationManager.GameDomain != null ? NegotiationManager.Config.HumanSide : null,
+                    HumanVariant = NegotiationManager.GameDomain != null ? NegotiationManager.Config.HumanVariant : null,
+                    AiVariant = NegotiationManager.GameDomain != null ? NegotiationManager.Config.AiVariant : null,
                 });
         }
 
         public ActionResult NewActiveDomain(int newActiveDomain)
         {
-            if (NegotiationManager.GameDomain.Id != newActiveDomain)
+            if (NegotiationManager.GameDomain == null || NegotiationManager.GameDomain.Id != newActiveDomain)
             {
                 NegotiationManager.SetNewDomain(newActiveDomain);
             }
+
+            return RedirectToAction("NegotiationDomainConfiguration");
+        }
+
+        public ActionResult SetDomainVariants(string humanSide, string humanVariant, string aiVariant)
+        {
+            NegotiationManager.SetDomainVariants(humanSide, humanVariant, aiVariant);
 
             return RedirectToAction("NegotiationDomainConfiguration");
         }

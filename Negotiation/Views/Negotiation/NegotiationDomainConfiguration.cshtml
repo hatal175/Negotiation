@@ -1,5 +1,5 @@
 ﻿@using Negotiation.Models
-@model NegotiationConfigurationModel<GameDomain>
+@model NegotiationDomainConfig
 @{
     ViewBag.Title = "NegotiationConfiguration";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,12 +25,32 @@
         using (Html.BeginForm("NewActiveDomain", "Negotiation", FormMethod.Post))
         {
             <h2>Active Domain:</h2>
-            @Html.DropDownList("newActiveDomain", Model.Items.Select(x => new SelectListItem {Text=x.Name, Value=x.Id.ToString(), Selected=(x.Id == Model.ActiveId)}));
-
+            @Html.DropDownList("newActiveDomain", Model.Items.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString(), Selected = (x.Id == Model.ActiveId) }), new {onchange="disableOther()" });
             <input type="submit" class="btn btn-default" value="Set Active Domain" />
         }
     }
+    @if (@Model.ActiveId != 0)
+    {
+        using (Html.BeginForm("SetDomainVariants", "Negotiation", FormMethod.Post))
+        {
+            <br /> @:Human Side:
+            @Html.DropDownList("humanSide", NegotiationManager.Domain.OwnerVariantDict.Keys.Select(x => new SelectListItem { Text = x, Value = x, Selected = x==Model.HumanSide }), new {id = "humanSide" })
+            <br /> @:Human Variant Name:
+            @Html.DropDownList("humanVariant", NegotiationManager.Domain.OwnerVariantDict.First().Value.Keys.Select(x => new SelectListItem { Text = x, Value = x , Selected = x==Model.HumanVariant}), new { id = "humanVariant" })
+            <br /> @:Ai Variant Name:
+            @Html.DropDownList("aiVariant", NegotiationManager.Domain.OwnerVariantDict.First().Value.Keys.Select(x => new SelectListItem { Text = x, Value = x, Selected = x==Model.AiVariant }), new { id = "aiVariant" })
+            <br />
+            <input type="submit" class="btn btn-default" value="Set Domain Variants" />
+        }
+    }
 </div>
+<script type="text/javascript">
+    disableOther = function () {
+        document.getElementById("humanSide").disabled = true;
+        document.getElementById("humanVariant").disabled = true;
+        document.getElementById("aiVariant").disabled = true;
+    };
+</script>
 
 
 

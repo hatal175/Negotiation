@@ -2,8 +2,8 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 05/13/2015 22:36:05
--- Generated from EDMX file: C:\Users\Inbal\Documents\Visual Studio 2013\Projects\Negotiation\Negotiation\Models\Negotiation.edmx
+-- Date Created: 05/17/2015 21:47:26
+-- Generated from EDMX file: C:\Users\Inbal\documents\visual studio 2013\Projects\Negotiation\Negotiation\Models\Negotiation.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
@@ -46,6 +46,12 @@ IF OBJECT_ID(N'[dbo].[FK_UserUserData]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_StrategyConfigStrategy]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[StrategyConfigSet] DROP CONSTRAINT [FK_StrategyConfigStrategy];
+GO
+IF OBJECT_ID(N'[dbo].[FK_GameDomainConfigDomainVariantAi]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[GameDomainConfigSet] DROP CONSTRAINT [FK_GameDomainConfigDomainVariantAi];
+GO
+IF OBJECT_ID(N'[dbo].[FK_GameDomainConfigDomainVariantHuman]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[GameDomainConfigSet] DROP CONSTRAINT [FK_GameDomainConfigDomainVariantHuman];
 GO
 
 -- --------------------------------------------------
@@ -153,7 +159,11 @@ GO
 
 -- Creating table 'GameDomainConfigSet'
 CREATE TABLE [dbo].[GameDomainConfigSet] (
-    [Id] int  NOT NULL
+    [Id] int  NOT NULL,
+    [AiSide] nvarchar(max)  NOT NULL,
+    [AiVariant] nvarchar(max)  NOT NULL,
+    [HumanSide] nvarchar(max)  NOT NULL,
+    [HumanVariant] nvarchar(max)  NOT NULL
 );
 GO
 
