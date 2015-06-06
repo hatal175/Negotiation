@@ -440,9 +440,9 @@ namespace Negotiation.Controllers
                 strategyDll.InputStream.CopyTo(fs);
             }
 
-            if (dependencyDlls != null) 
+            if (dependencyDlls != null && dependencyDlls.Any()) 
             {
-                foreach (var dll in dependencyDlls)
+                foreach (var dll in dependencyDlls.Where(x=>x!=null))
 	            {
                     String dependencyDllPath = Path.Combine(DllDirPath, dll.FileName);
 
