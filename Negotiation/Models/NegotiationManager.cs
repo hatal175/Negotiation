@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Timers;
+using System.IO;
 
 namespace Negotiation.Models
 {
@@ -53,7 +54,9 @@ namespace Negotiation.Models
 
         public static int TotalRounds;
         public static TimeSpan RoundLength;
-        public static Timer m_cleanupTimer;
+        private static Timer m_cleanupTimer;
+
+        private static String m_currentStrategyDirPath;
 
         static NegotiationManager()
         {
@@ -65,6 +68,30 @@ namespace Negotiation.Models
 
             m_cleanupTimer = new Timer(TimeSpan.FromMinutes(1).TotalMilliseconds);
             m_cleanupTimer.Elapsed += m_cleanupTimer_Elapsed;
+
+            SetupStrategy();
+
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveStrategyDlls;
+        }
+
+        private static void SetupStrategy()
+        {
+            NegotiationContainer cont = new NegotiationContainer();
+            var strat = cont.StrategyConfigSet.FirstOrDefault();
+
+            m_currentStrategyDirPath = Path.GetDirectoryName(HttpContext.Current.Server.MapPath(strat.Strategy.DllPath));
+        }
+
+        static Assembly ResolveStrategyDlls (object sender, ResolveEventArgs args)
+        {
+            AssemblyName assemblyName = new AssemblyName(args.Name);
+            String resolveDllPath = Path.Combine(m_currentStrategyDirPath, assemblyName.Name + ".dll");
+            if (File.Exists(resolveDllPath))
+            {
+                return Assembly.LoadFile(resolveDllPath); ;
+            }
+
+            return null;
         }
 
         static void m_cleanupTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -252,13 +279,22 @@ namespace Negotiation.Models
             NegotiationContainer cont = new NegotiationContainer();
             var strat = cont.StrategySet.Find(strategyId);
 
-            Assembly assembly = Assembly.LoadFile(HttpContext.Current.Server.MapPath(strat.DllPath));
+            String dllPath = HttpContext.Current.Server.MapPath(strat.DllPath);
+            String dllDir = System.IO.Path.GetDirectoryName(dllPath);
+
+            Assembly assembly = Assembly.LoadFile(dllPath);
+
             Type type = assembly.GetTypes().First(x => x.GetInterface("IAgentStrategy") != null);
             IAgentStrategy example = assembly.CreateInstance(type.FullName) as IAgentStrategy;
 
             strategyName = strat.StrategyName;
 
             return example;
+        }
+
+        private static Assembly MyResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            throw new NotImplementedException();
         }
 
         internal static IEnumerable<Game> GetGames()
@@ -374,6 +410,8 @@ namespace Negotiation.Models
             
             cont.StrategyConfigSet.Add(new StrategyConfig() { Id = newActiveStrategy });
             cont.SaveChanges();
+
+            SetupStrategy();
         }
 
         internal static void CreateStrategy(string strategyName, string DllPath)

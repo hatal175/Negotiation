@@ -5,11 +5,17 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Negotiation", "Negotiation\Negotiation.csproj", "{AB46E948-DF60-422E-A1F2-6D935B1D538C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Negotiation.Tests", "Negotiation.Tests\Negotiation.Tests.csproj", "{60238DFF-B425-4753-A7B6-32CF95CCC2C0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestStrategy", "TestStrategy\TestStrategy.csproj", "{EC7E32FB-37C0-4034-96EE-73E11ECB15FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DonaStrategy", "DonaStrategy\DonaStrategy.csproj", "{4CF80792-9010-4E9E-B0A2-78CFF9AAAD13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseDonaStrategy", "BaseDonaStrategy\BaseDonaStrategy.csproj", "{4CF80792-9010-4E9E-B0A2-78CFF9AAAD13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dona.Basic", "Dona.Basic\Dona.Basic.csproj", "{33835A91-B04C-4C25-A378-E9A56D0D1726}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dona.EnemyVariantLogic", "Dona.EnemyVariantLogic\Dona.EnemyVariantLogic.csproj", "{E975425A-5BB6-466A-B320-8ADF96DD9656}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dona.OfferTypesWithinRound", "Dona.OfferTypesWithinRound\Dona.OfferTypesWithinRound.csproj", "{8E3A2100-AB0E-43FE-BB3B-0AB51490F670}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KBAgent", "KBAgent\KBAgent.csproj", "{F6D0283A-1618-4BA2-A723-77D664E1EE73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +27,6 @@ Global
 		{AB46E948-DF60-422E-A1F2-6D935B1D538C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB46E948-DF60-422E-A1F2-6D935B1D538C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB46E948-DF60-422E-A1F2-6D935B1D538C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{60238DFF-B425-4753-A7B6-32CF95CCC2C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{60238DFF-B425-4753-A7B6-32CF95CCC2C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60238DFF-B425-4753-A7B6-32CF95CCC2C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{60238DFF-B425-4753-A7B6-32CF95CCC2C0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EC7E32FB-37C0-4034-96EE-73E11ECB15FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EC7E32FB-37C0-4034-96EE-73E11ECB15FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC7E32FB-37C0-4034-96EE-73E11ECB15FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +35,22 @@ Global
 		{4CF80792-9010-4E9E-B0A2-78CFF9AAAD13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CF80792-9010-4E9E-B0A2-78CFF9AAAD13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CF80792-9010-4E9E-B0A2-78CFF9AAAD13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33835A91-B04C-4C25-A378-E9A56D0D1726}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33835A91-B04C-4C25-A378-E9A56D0D1726}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33835A91-B04C-4C25-A378-E9A56D0D1726}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33835A91-B04C-4C25-A378-E9A56D0D1726}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E975425A-5BB6-466A-B320-8ADF96DD9656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E975425A-5BB6-466A-B320-8ADF96DD9656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E975425A-5BB6-466A-B320-8ADF96DD9656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E975425A-5BB6-466A-B320-8ADF96DD9656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E3A2100-AB0E-43FE-BB3B-0AB51490F670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E3A2100-AB0E-43FE-BB3B-0AB51490F670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E3A2100-AB0E-43FE-BB3B-0AB51490F670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E3A2100-AB0E-43FE-BB3B-0AB51490F670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

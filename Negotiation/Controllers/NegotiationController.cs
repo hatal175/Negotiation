@@ -417,7 +417,7 @@ namespace Negotiation.Controllers
         }
 
         [HttpPost]
-        public ActionResult UploadStrategy(String strategyName, HttpPostedFileBase strategyDll)
+        public ActionResult UploadStrategy(String strategyName, HttpPostedFileBase strategyDll, IEnumerable<HttpPostedFileBase> dependencyDlls)
         {
             if (strategyName == null || strategyDll == null) return RedirectToAction("NegotiationStrategyConfiguration");
 
@@ -426,15 +426,34 @@ namespace Negotiation.Controllers
                 return RedirectToAction("NegotiationStrategyConfiguration");
             }
 
-            String virtualPath = Path.Combine("~/Dlls", DateTime.Now.ToString("yyyyMMdd.hh.mm.ss.") + strategyDll.FileName);
-            String DllPath = System.Web.HttpContext.Current.Server.MapPath(virtualPath);
+            String virtualDirPath = Path.Combine("~/Dlls", DateTime.Now.ToString("yyyyMMdd.hh.mm.ss.") + strategyDll.FileName);
+            String virtualDllPath = Path.Combine(virtualDirPath, strategyDll.FileName);
+
+            String DllDirPath = System.Web.HttpContext.Current.Server.MapPath(virtualDirPath);
+
+            Directory.CreateDirectory(DllDirPath);
+
+            String DllPath = Path.Combine(DllDirPath, strategyDll.FileName);
 
             using (FileStream fs = new FileStream(DllPath, FileMode.CreateNew))
             {
                 strategyDll.InputStream.CopyTo(fs);
             }
 
-            NegotiationManager.CreateStrategy(strategyName, virtualPath);
+            if (dependencyDlls != null) 
+            {
+                foreach (var dll in dependencyDlls)
+	            {
+                    String dependencyDllPath = Path.Combine(DllDirPath, dll.FileName);
+
+                    using (FileStream fs = new FileStream(dependencyDllPath, FileMode.CreateNew))
+                    {
+                        dll.InputStream.CopyTo(fs);
+                    }
+	            }
+            }
+
+            NegotiationManager.CreateStrategy(strategyName, virtualDllPath);
 
             return RedirectToAction("NegotiationStrategyConfiguration");
         }

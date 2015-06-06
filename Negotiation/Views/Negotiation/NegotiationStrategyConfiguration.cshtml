@@ -10,7 +10,8 @@
 {
     <div>
         Enter strategy name: @Html.TextBox("strategyName") <br /><br />
-        Choose Strategy DLL file: <input type="file" name="strategyDll" /> <br />
+        Choose Strategy DLL file: <input type="file" name="strategyDll" /> <br /><br />
+        Choose Strategy DLL dependencies (Optional): <input type="file" name="dependencyDlls" multiple /> <br />
     </div>
     <input type="submit" class="btn btn-default" value="Upload Strategy" />
 }
