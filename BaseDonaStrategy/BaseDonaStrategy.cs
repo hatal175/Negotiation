@@ -117,7 +117,7 @@ namespace DonaStrategy
 
         protected void SendOffer(NegotiationOffer offer)
         {
-            if (offer != null && CurrentOffer != offer)
+            if (offer != null)
             {
                 CurrentOffer = offer;
                 Client.SendOffer(CurrentOffer);

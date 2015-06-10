@@ -48,7 +48,7 @@ namespace Dona.Basic
             CompareOffer(e.Offer);
         }
 
-        protected void CompareOffer(NegotiationOffer offer)
+        protected virtual void CompareOffer(NegotiationOffer offer)
         {
             if (offer == null)
             {

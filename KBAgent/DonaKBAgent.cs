@@ -46,6 +46,8 @@ namespace KBAgent
             GuessOpponentType(newTypeProbabilites.ArgMax(x => x.Value).Key);
 
             m_typeProbabilites = newTypeProbabilites;
+
+            base.OnOfferReceivedEvent(sender, e);
         }
 
         private void GuessOpponentType(string opponentType)
