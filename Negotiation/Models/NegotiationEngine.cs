@@ -49,6 +49,7 @@ namespace Negotiation.Models
                 RemainingTime = TimeSpan.FromSeconds(domain.NumberOfRounds * domain.RoundLength.TotalSeconds),
                 HumanStatus = new SideStatus() { Offer = EmptyOffer() },
                 AiStatus = new SideStatus() { Offer = EmptyOffer() },
+                LastAcceptedOffer = EmptyOffer()
             };
 
             Actions = new List<NegotiationActionModel>();
@@ -88,6 +89,7 @@ namespace Negotiation.Models
             channel.NewOfferEvent += channel_NewOfferEvent;
             channel.OfferAcceptedEvent += channel_OfferAcceptedEvent;
             channel.OptOutEvent += channel_OptOutEvent;
+            channel.AgreementSignedEvent += channel_AgreementSignedEvent;
         }
 
         private void UnregisterChannel(INegotiationServer channel)
@@ -95,6 +97,58 @@ namespace Negotiation.Models
             channel.NewOfferEvent -= channel_NewOfferEvent;
             channel.OfferAcceptedEvent -= channel_OfferAcceptedEvent;
             channel.OptOutEvent -= channel_OptOutEvent;
+            channel.AgreementSignedEvent -= channel_AgreementSignedEvent;
+        }
+
+        void channel_AgreementSignedEvent(object sender, EventArgs e)
+        {
+            NegotiationOffer offer;
+            SideConfig signingSide;
+
+            if (((INegotiationChannel)sender) == AiChannel)
+            {
+                Status.AiStatus.Signed = true;
+                signingSide = AiConfig;
+            }
+            else
+            {
+                Status.HumanStatus.Signed = true;
+                signingSide = HumanConfig;
+            }
+
+            this.Actions.Add(new NegotiationActionModel()
+            {
+                RemainingTime = Status.RemainingTime,
+                Role = signingSide.Side,
+                Type = NegotiationActionType.Sign
+            });
+
+            NegotiationManager.SaveAgreementSigned(this, signingSide);
+
+            if (!Status.AiStatus.Signed || !Status.HumanStatus.Signed)
+            {
+                return;
+            }
+
+            SideConfig acceptingConfig;
+
+            if (Status.AcceptedOfferSide == AiChannel)
+            {
+                Status.State = NegotiationState.EndHumanOfferAccepted;
+                offer = Status.HumanStatus.Offer;
+                acceptingConfig = AiConfig;
+            }
+            else
+            {
+                Status.State = NegotiationState.EndAiOfferAccepted;
+                offer = Status.AiStatus.Offer;
+                acceptingConfig = HumanConfig;
+            }
+
+            Status.HumanStatus.Score = CalculateAcceptScore(HumanConfig, offer);
+            Status.AiStatus.Score = CalculateAcceptScore(AiConfig, offer);
+
+            EndNegotiation();
         }
 
         void channel_OptOutEvent(object sender, EventArgs e)
@@ -108,6 +162,7 @@ namespace Negotiation.Models
 
             this.Actions.Add(new NegotiationActionModel()
             {
+                RemainingTime = Status.RemainingTime,
                 Role = (((INegotiationChannel)sender) == AiChannel) ? AiConfig.Side : HumanConfig.Side,
                 Type = NegotiationActionType.Optout,
             });
@@ -122,39 +177,35 @@ namespace Negotiation.Models
 
         void channel_OfferAcceptedEvent(object sender, EventArgs e)
         {
-            NegotiationOffer offer;
-            SideConfig acceptingConfig;
             if (sender == AiChannel)
             {
-                Status.State = NegotiationState.EndHumanOfferAccepted;
-                offer = Status.HumanStatus.Offer;
-                acceptingConfig = AiConfig;
-
+                Status.LastAcceptedOffer = Status.HumanStatus.Offer;
             }
             else
             {
-                Status.State = NegotiationState.EndAiOfferAccepted;
-                offer = Status.AiStatus.Offer;
-                acceptingConfig = HumanConfig;
+                Status.LastAcceptedOffer = Status.AiStatus.Offer;
             }
 
-            Status.HumanStatus.Score = CalculateAcceptScore(HumanConfig, offer);
-            Status.AiStatus.Score = CalculateAcceptScore(AiConfig, offer);
+            Status.AiStatus.Signed = false;
+            Status.HumanStatus.Signed = false;
 
-            ThreadPool.QueueUserWorkItem(x =>
-            {
-                GetOtherChannel((INegotiationChannel)sender).OpponentAcceptedOffer();
-            });
+            Status.AcceptedOfferSide = (INegotiationChannel)sender;
+
+            SideConfig side = (Status.AcceptedOfferSide == AiChannel) ? AiConfig : HumanConfig;
 
             this.Actions.Add(new NegotiationActionModel()
             {
-                Role = (((INegotiationChannel)sender) == AiChannel) ? AiConfig.Side : HumanConfig.Side,
+                RemainingTime = Status.RemainingTime,
+                Role = side.Side,
                 Type = NegotiationActionType.AcceptOffer
             });
 
-            NegotiationManager.SaveOfferAccepted(this, acceptingConfig);
+            NegotiationManager.SaveOfferAccepted(this, side);
 
-            EndNegotiation();
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                GetOtherChannel(Status.AcceptedOfferSide).OpponentAcceptedOffer();
+            });
         }
 
         private int CalculateAcceptScore(SideConfig config, NegotiationOffer offer)

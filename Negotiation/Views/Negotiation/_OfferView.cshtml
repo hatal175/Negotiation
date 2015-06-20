@@ -1,4 +1,4 @@
-﻿@model Negotiation.Models.NegotiationOffer
+﻿@model Negotiation.Models.OfferViewModel
 @{
     Layout = null;
 }
@@ -8,13 +8,13 @@
             <b>Issue:</b>
         </td>
     </tr>
-    @foreach (var topic in Model.Offers)
+    @foreach (var topic in Model.Offer.Offers)
     {
         <tr>
             <td>
                 @(topic.Key + ":")
             </td>
-            <td id='opOffer_@(topic.Key.Replace(' ','_'))'>
+            <td id='@(Model.DataPrefix)_@(topic.Key.Replace(' ','_'))'>
                 @topic.Value
             </td>
         </tr>

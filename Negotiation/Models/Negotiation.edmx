@@ -349,6 +349,8 @@
           <Member Name="OptoutReceive" />
           <Member Name="Disconnect" />
           <Member Name="Timeout" />
+          <Member Name="Sign" />
+          <Member Name="RejectOffer" />
         </EnumType>
         <EntityType Name="User">
           <Key>

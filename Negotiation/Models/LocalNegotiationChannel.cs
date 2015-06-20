@@ -107,5 +107,25 @@ namespace Negotiation.Models
                 NegotiationEndedEvent(this, EventArgs.Empty);
             }
         }
+
+        public void SignAgreement()
+        {
+            if (AgreementSignedEvent != null)
+            {
+                AgreementSignedEvent(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler AgreementSignedEvent;
+
+        public void RejectOffer()
+        {
+            if (OfferRejectedEvent != null)
+            {
+                OfferRejectedEvent(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler OfferRejectedEvent;
     }
 }

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 05/17/2015 21:47:26
+-- Date Created: 06/20/2015 18:32:55
 -- Generated from EDMX file: C:\Users\Inbal\documents\visual studio 2013\Projects\Negotiation\Negotiation\Models\Negotiation.edmx
 -- --------------------------------------------------
 
@@ -46,12 +46,6 @@ IF OBJECT_ID(N'[dbo].[FK_UserUserData]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_StrategyConfigStrategy]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[StrategyConfigSet] DROP CONSTRAINT [FK_StrategyConfigStrategy];
-GO
-IF OBJECT_ID(N'[dbo].[FK_GameDomainConfigDomainVariantAi]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[GameDomainConfigSet] DROP CONSTRAINT [FK_GameDomainConfigDomainVariantAi];
-GO
-IF OBJECT_ID(N'[dbo].[FK_GameDomainConfigDomainVariantHuman]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[GameDomainConfigSet] DROP CONSTRAINT [FK_GameDomainConfigDomainVariantHuman];
 GO
 
 -- --------------------------------------------------

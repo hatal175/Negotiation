@@ -41,6 +41,7 @@ namespace DonaStrategy
             Client.NegotiationEndedEvent += OnNegotiationEndedEvent;
             Client.OfferReceivedEvent += OnOfferReceivedEvent;
             Client.TimePassedEvent += OnTimePassedEventInner;
+            Client.OpponentAcceptedOfferEvent += OnOpponentAcceptedOfferEvent;
 
             CalculateOffers();
         }
@@ -108,6 +109,11 @@ namespace DonaStrategy
             OnTimePassedEvent(sender, new ExtendedTimePassedEventArgs(e.RemainingTime, hasRoundPassed));
         }
 
+        void OnOpponentAcceptedOfferEvent(object sender, EventArgs e)
+        {
+            Client.SignAgreement();
+        }
+
         protected abstract void OnOfferReceivedEvent(object sender, OfferEventArgs e); 
 
         protected virtual void OnNegotiationStartedEvent(object sender, EventArgs e)
@@ -124,12 +130,19 @@ namespace DonaStrategy
             }
         }
 
+        protected void AcceptOffer()
+        {
+            Client.AcceptOffer();
+            Client.SignAgreement();
+        }
+
         protected virtual void OnNegotiationEndedEvent(object sender, EventArgs e)
         {
             Client.NegotiationStartedEvent -= OnNegotiationStartedEvent;
             Client.NegotiationEndedEvent -= OnNegotiationEndedEvent;
             Client.OfferReceivedEvent -= OnOfferReceivedEvent;
             Client.TimePassedEvent -= OnTimePassedEventInner;
+            Client.OpponentAcceptedOfferEvent -= OnOpponentAcceptedOfferEvent;
         }
     }
 }

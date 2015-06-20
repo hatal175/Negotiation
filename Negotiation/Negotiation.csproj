@@ -242,6 +242,7 @@
     <Compile Include="Models\NegotiationTopic.cs" />
     <Compile Include="Models\NegotiationTopicOffer.cs" />
     <Compile Include="Models\NegotiationViewModel.cs" />
+    <Compile Include="Models\OfferViewModel.cs" />
     <Compile Include="Models\PreNegotiationQuestionnaireViewModel.cs" />
     <Compile Include="Models\ScoredNegotiationOption.cs" />
     <Compile Include="Models\Strategy.cs">

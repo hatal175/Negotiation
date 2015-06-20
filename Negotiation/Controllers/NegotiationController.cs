@@ -187,7 +187,8 @@ namespace Negotiation.Controllers
                 Domain = engine.Domain,
                 Actions = engine.Actions,
                 OpponentOffer = engine.Status.AiStatus.Offer,
-                Offer = engine.Status.HumanStatus.Offer
+                Offer = engine.Status.HumanStatus.Offer,
+                LastAcceptedOffer = engine.Status.LastAcceptedOffer
             };
 
             return View(model);
@@ -219,13 +220,46 @@ namespace Negotiation.Controllers
 
             if (!engine.NegotiationActive)
             {
-                return NegotiationEnd(negotiationId);
+                return new EmptyResult();
             }
 
             engine.HumanChannel.AcceptOffer();
 
-            return View("NegotiationEndView",
-                engine.GetEndModel());
+            return new EmptyResult();
+        }
+
+        [HttpPost]
+        public ActionResult RejectOffer(String negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            if (!engine.NegotiationActive)
+            {
+                return new EmptyResult();
+            }
+
+            engine.HumanChannel.RejectOffer();
+
+            return new EmptyResult();
+        }
+
+        [HttpPost]
+        public ActionResult SignAgreement(String negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            if (!engine.NegotiationActive)
+            {
+                return new EmptyResult();
+            }
+
+            engine.HumanChannel.SignAgreement();
+
+            return new EmptyResult();
         }
 
         public ActionResult UpdateOpponentOffer(String negotiationId)
@@ -236,7 +270,30 @@ namespace Negotiation.Controllers
 
             if (!engine.NegotiationActive) return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
 
-            return PartialView("_OfferView", engine.Status.AiStatus.Offer);
+            return PartialView(
+                "_OfferView",
+                new OfferViewModel()
+                {
+                    Offer = engine.Status.AiStatus.Offer,
+                    DataPrefix = "opOffer"
+                });
+        }
+
+        public ActionResult UpdateLastAcceptedOffer(String negotiationId)
+        {
+            NegotiationEngine engine;
+            if (negotiationId == null || !NegotiationManager.OnGoingNegotiations.TryGetValue(negotiationId, out engine))
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            if (!engine.NegotiationActive) return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            return PartialView(
+                "_OfferView",
+                new OfferViewModel()
+                {
+                    Offer = engine.Status.LastAcceptedOffer,
+                    DataPrefix = "acceptedOffer"
+                });
         }
 
         public ActionResult UpdateActionHistory(String negotiationId)

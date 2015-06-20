@@ -23,6 +23,7 @@ namespace Negotiation.Models
 
         public NegotiationOffer Offer { get; set; }
         public NegotiationOffer OpponentOffer { get; set; }
+        public NegotiationOffer LastAcceptedOffer { get; set; }
 
         public TimeSpan RemainingTime { get; set; }
 

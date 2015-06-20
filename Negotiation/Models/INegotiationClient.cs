@@ -11,6 +11,8 @@ namespace Negotiation.Models
         void OptOut();
         void SendOffer(NegotiationOffer offer);
         void AcceptOffer();
+        void RejectOffer();
+        void SignAgreement();
 
         event EventHandler NegotiationStartedEvent;
         event EventHandler<OfferEventArgs> OfferReceivedEvent;

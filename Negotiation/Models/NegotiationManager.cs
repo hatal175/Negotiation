@@ -269,6 +269,11 @@ namespace Negotiation.Models
             SaveAction(engine, side, NegotiationActionType.AcceptOffer);
         }
 
+        internal static void SaveAgreementSigned(NegotiationEngine engine, SideConfig side)
+        {
+            SaveAction(engine, side, NegotiationActionType.Sign);
+        }
+
         internal static void SaveTimeout(NegotiationEngine engine)
         {
             SaveAction(engine, engine.HumanConfig, NegotiationActionType.Timeout);

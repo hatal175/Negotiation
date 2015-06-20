@@ -59,21 +59,21 @@ namespace Dona.Basic
             {
                 if (offer.Equals(CurrentOffer))
                 {
-                    Client.AcceptOffer();
+                    AcceptOffer();
                 }
             }
             else if (RoundsPassed < Domain.NumberOfRounds - 1)
             {
                 if (AllOptions[offer].Utility >= BestFScoreUtilityOffers.Values.Min(x => x.Utility))
                 {
-                    Client.AcceptOffer();
+                    AcceptOffer();
                 }
             }
             else
             {
                 if (AllOptions[offer].Utility >= BestCombinedUtilityOffers.Values.Min(x => x.Utility))
                 {
-                    Client.AcceptOffer();
+                    AcceptOffer();
                 }
             }
         }
