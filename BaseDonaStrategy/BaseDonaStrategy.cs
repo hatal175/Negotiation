@@ -125,7 +125,7 @@ namespace DonaStrategy
         {
             if (offer != null)
             {
-                if (sendIdentical || CurrentOffer != offer)
+                if (sendIdentical || !CurrentOffer.Equals(offer))
                 {
                     CurrentOffer = offer;
                     Client.SendOffer(CurrentOffer);
