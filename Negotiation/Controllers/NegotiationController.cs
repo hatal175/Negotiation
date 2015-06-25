@@ -24,6 +24,11 @@ namespace Negotiation.Controllers
             return View();
         }
 
+        public ActionResult IRBView()
+        {
+            return View();
+        }
+
         public ActionResult SubmitUserData(PreNegotiationQuestionnaireViewModel model)
         {
             if (!ModelState.IsValid)
@@ -140,6 +145,7 @@ namespace Negotiation.Controllers
 
             if (!model.Questions.Select(x => x.Answer).SequenceEqual(NegotiationManager.TutorialModels[model.TutorialId].Questions.Select(x => x.ActualAnswer)))
             {
+                ModelState.AddModelError("Wrong answer", "One or more answers was wrong.");
                 return View("NegotiationTutorial", NegotiationManager.TutorialModels[model.TutorialId]);
             }
 

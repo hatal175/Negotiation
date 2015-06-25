@@ -121,12 +121,15 @@ namespace DonaStrategy
             SendOffer(BestOffer);
         }
 
-        protected void SendOffer(NegotiationOffer offer)
+        protected void SendOffer(NegotiationOffer offer, Boolean sendIdentical = true)
         {
             if (offer != null)
             {
-                CurrentOffer = offer;
-                Client.SendOffer(CurrentOffer);
+                if (sendIdentical || CurrentOffer != offer)
+                {
+                    CurrentOffer = offer;
+                    Client.SendOffer(CurrentOffer);
+                }
             }
         }
 

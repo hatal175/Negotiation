@@ -269,6 +269,11 @@ namespace Negotiation.Models
             SaveAction(engine, side, NegotiationActionType.AcceptOffer);
         }
 
+        internal static void SaveOfferRejected(NegotiationEngine engine, SideConfig side)
+        {
+            SaveAction(engine, side, NegotiationActionType.RejectOffer);
+        }
+
         internal static void SaveAgreementSigned(NegotiationEngine engine, SideConfig side)
         {
             SaveAction(engine, side, NegotiationActionType.Sign);
@@ -461,5 +466,7 @@ namespace Negotiation.Models
 
             Config = domainConfig;
         }
+
+       
     }
 }

@@ -90,6 +90,7 @@ namespace Negotiation.Models
             channel.OfferAcceptedEvent += channel_OfferAcceptedEvent;
             channel.OptOutEvent += channel_OptOutEvent;
             channel.AgreementSignedEvent += channel_AgreementSignedEvent;
+            channel.OfferRejectedEvent += channel_OfferRejectedEvent;
         }
 
         private void UnregisterChannel(INegotiationServer channel)
@@ -98,6 +99,26 @@ namespace Negotiation.Models
             channel.OfferAcceptedEvent -= channel_OfferAcceptedEvent;
             channel.OptOutEvent -= channel_OptOutEvent;
             channel.AgreementSignedEvent -= channel_AgreementSignedEvent;
+            channel.OfferRejectedEvent -= channel_OfferRejectedEvent;
+        }
+
+        void channel_OfferRejectedEvent(object sender, EventArgs e)
+        {
+            SideConfig side = (sender == AiChannel) ? AiConfig : HumanConfig;
+
+            this.Actions.Add(new NegotiationActionModel()
+            {
+                RemainingTime = Status.RemainingTime,
+                Role = side.Side,
+                Type = NegotiationActionType.RejectOffer
+            });
+
+            NegotiationManager.SaveOfferRejected(this, side);
+
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                GetOtherChannel((INegotiationChannel)sender).OpponentRejectedOffer();
+            });
         }
 
         void channel_AgreementSignedEvent(object sender, EventArgs e)

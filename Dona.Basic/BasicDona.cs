@@ -23,16 +23,16 @@ namespace Dona.Basic
             }
             else if (RoundsPassed < Domain.NumberOfRounds - 1)
             {
-                CompareOffer(OpponentOffer);
+                CompareOffer(OpponentOffer, false);
                 SendOffer(BestFScoreUtilityOffers.Values.ElementAt(RoundsPassed % BestFScoreUtilityOffers.Count).Offer);
             }
             else
             {
-                CompareOffer(OpponentOffer);
+                CompareOffer(OpponentOffer, false);
                 int roundPart = (int)(Domain.RoundLength.TotalSeconds / Domain.OwnerVariantDict[this.OpponentSide].Count);
                 int offerIndex = Math.Min(BestCombinedUtilityOffers.Count - 1, ((int)e.RemainingTime.TotalSeconds) / roundPart);
                 NegotiationOffer offer = BestCombinedUtilityOffers.Values.ElementAtOrDefault(offerIndex).Offer;
-                SendOffer(offer);
+                SendOffer(offer, false);
             }
         }
 
@@ -48,7 +48,7 @@ namespace Dona.Basic
             CompareOffer(e.Offer);
         }
 
-        protected virtual void CompareOffer(NegotiationOffer offer)
+        protected virtual void CompareOffer(NegotiationOffer offer, Boolean sendReject = true)
         {
             if (offer == null)
             {
@@ -60,6 +60,7 @@ namespace Dona.Basic
                 if (offer.Equals(CurrentOffer))
                 {
                     AcceptOffer();
+                    return;
                 }
             }
             else if (RoundsPassed < Domain.NumberOfRounds - 1)
@@ -67,6 +68,7 @@ namespace Dona.Basic
                 if (AllOptions[offer].Utility >= BestFScoreUtilityOffers.Values.Min(x => x.Utility))
                 {
                     AcceptOffer();
+                    return;
                 }
             }
             else
@@ -74,8 +76,12 @@ namespace Dona.Basic
                 if (AllOptions[offer].Utility >= BestCombinedUtilityOffers.Values.Min(x => x.Utility))
                 {
                     AcceptOffer();
+                    return;
                 }
             }
+
+            if (sendReject)
+                Client.RejectOffer();
         }
     }
 }

@@ -80,7 +80,7 @@
             </td>
         </tr>
         <tr>
-            <td class="tablecelltitle">I consent to the IRB (Institutional Review Board) form:</td>
+            <td class="tablecelltitle">I consent to the @Html.ActionLink("IRB (Institutional Review Board) form", "IRBView", new { }, new { target = "_blank" }):</td>
             <td class="tablecellcontent">
                @Html.CheckBoxFor(m => m.AgreeIRB) 
             </td>

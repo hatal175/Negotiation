@@ -127,5 +127,15 @@ namespace Negotiation.Models
         }
 
         public event EventHandler OfferRejectedEvent;
+
+        public event EventHandler OpponentRejectedOfferEvent;
+
+        public void OpponentRejectedOffer()
+        {
+            if (OpponentRejectedOfferEvent != null)
+            {
+                OpponentRejectedOfferEvent(this, EventArgs.Empty);
+            }
+        }
     }
 }

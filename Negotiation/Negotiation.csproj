@@ -339,6 +339,7 @@
     <Content Include="Views\Negotiation\GameSummaryView.cshtml" />
     <Content Include="Views\Negotiation\UserSummaryView.cshtml" />
     <Content Include="Views\Negotiation\NegotiationStrategyConfiguration.cshtml" />
+    <Content Include="Views\Negotiation\IRBView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

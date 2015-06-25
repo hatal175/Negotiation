@@ -20,9 +20,15 @@
         @Html.DropDownListFor(m => m.Questions[i].Answer, Model.Questions[i].Options.Select(x=>new SelectListItem{Text=x,Value=x}), "--select--")
     }
 
+    
+
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input type="submit" class="btn btn-default" value="Continue" />
         </div>
+    </div>
+
+    <div style="color:red">
+        @Html.ValidationSummary()
     </div>
 }

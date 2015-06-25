@@ -28,6 +28,7 @@ namespace Negotiation.Models
         void NegotiationEnded();
         void OpponentOfferReceived(NegotiationOffer offer);
         void OpponentAcceptedOffer();
+        void OpponentRejectedOffer();
         void OpponentOptOutReceived();
         void TimeOut();
         void TimePassed(TimeSpan remainingTime);
