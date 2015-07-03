@@ -60,8 +60,8 @@ namespace Negotiation.Models
 
         static NegotiationManager()
         {
-            TotalRounds = 15;
-            RoundLength = new TimeSpan(0, 2, 0);
+            TotalRounds = 5;
+            RoundLength = new TimeSpan(0, 0, 30);
             OnGoingNegotiations = new ConcurrentDictionary<string, NegotiationEngine>();
             TutorialModels = new ConcurrentDictionary<string, NegotiationTutorialModel>();
             LoadDbData();
@@ -455,7 +455,7 @@ namespace Negotiation.Models
         internal static void SetDomainVariants(string humanSide, string humanVariant, string aiVariant)
         {
             NegotiationContainer cont = new NegotiationContainer();
-            var domainConfig = new NegotiationContainer().GameDomainConfigSet.First();
+            var domainConfig = cont.GameDomainConfigSet.First();
 
             domainConfig.HumanSide = humanSide;
             domainConfig.HumanVariant = humanVariant;
