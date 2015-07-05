@@ -19,6 +19,8 @@ namespace DonaStrategy
         protected Dictionary<NegotiationOffer, OfferUtility> AllOptions { get; set; }
         protected NegotiationOffer BestOffer { get; set; }
 
+        protected Boolean HasAcceptedLastOffer { get; set; }
+
         public virtual TimeSpan MinimumUpdateTime
         {
             get { return TimeSpan.FromSeconds(1); }
@@ -39,7 +41,7 @@ namespace DonaStrategy
 
             Client.NegotiationStartedEvent += OnNegotiationStartedEvent;
             Client.NegotiationEndedEvent += OnNegotiationEndedEvent;
-            Client.OfferReceivedEvent += OnOfferReceivedEvent;
+            Client.OfferReceivedEvent += OnOfferReceivedEventInner;
             Client.TimePassedEvent += OnTimePassedEventInner;
             Client.OpponentAcceptedOfferEvent += OnOpponentAcceptedOfferEvent;
 
@@ -114,7 +116,13 @@ namespace DonaStrategy
             Client.SignAgreement();
         }
 
-        protected abstract void OnOfferReceivedEvent(object sender, OfferEventArgs e); 
+        protected void OnOfferReceivedEventInner(object sender, OfferEventArgs e)
+        {
+            HasAcceptedLastOffer = false;
+            OnOfferReceivedEvent(sender, e);
+        }
+
+        protected abstract void OnOfferReceivedEvent(object sender, OfferEventArgs e);
 
         protected virtual void OnNegotiationStartedEvent(object sender, EventArgs e)
         {
@@ -135,6 +143,9 @@ namespace DonaStrategy
 
         protected void AcceptOffer()
         {
+            if (HasAcceptedLastOffer) return;
+
+            HasAcceptedLastOffer = true;
             Client.AcceptOffer();
             Client.SignAgreement();
         }
@@ -143,7 +154,7 @@ namespace DonaStrategy
         {
             Client.NegotiationStartedEvent -= OnNegotiationStartedEvent;
             Client.NegotiationEndedEvent -= OnNegotiationEndedEvent;
-            Client.OfferReceivedEvent -= OnOfferReceivedEvent;
+            Client.OfferReceivedEvent -= OnOfferReceivedEventInner;
             Client.TimePassedEvent -= OnTimePassedEventInner;
             Client.OpponentAcceptedOfferEvent -= OnOpponentAcceptedOfferEvent;
         }

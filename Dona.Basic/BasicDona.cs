@@ -28,12 +28,21 @@ namespace Dona.Basic
             }
             else
             {
-                CompareOffer(OpponentOffer, false);
-                int roundPart = (int)(Domain.RoundLength.TotalSeconds / Domain.OwnerVariantDict[this.OpponentSide].Count);
-                int offerIndex = Math.Min(BestCombinedUtilityOffers.Count - 1, ((int)e.RemainingTime.TotalSeconds) / roundPart);
-                NegotiationOffer offer = BestCombinedUtilityOffers.Values.ElementAtOrDefault(offerIndex).Offer;
-                SendOffer(offer, false);
+                RoundRobinOffer(BestCombinedUtilityOffers.Values, e.RemainingTime);
             }
+        }
+
+        protected void RoundRobinOffer(ICollection<OfferUtility> offers, TimeSpan remainingTime)
+        {
+            CompareOffer(OpponentOffer, false);
+            int roundPart = (int)(Domain.RoundLength.TotalSeconds / offers.Count);
+            int offerIndex = 
+                Math.Min(
+                offers.Count - 1, 
+                (Math.Max(0,(int)remainingTime.TotalSeconds-1) / roundPart) % offers.Count
+                );
+            NegotiationOffer offer = offers.ElementAtOrDefault(offerIndex).Offer;
+            SendOffer(offer, false);
         }
 
         protected override void OnOfferReceivedEvent(object sender, Negotiation.Models.OfferEventArgs e)

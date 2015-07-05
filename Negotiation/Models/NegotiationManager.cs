@@ -60,8 +60,8 @@ namespace Negotiation.Models
 
         static NegotiationManager()
         {
-            TotalRounds = 5;
-            RoundLength = new TimeSpan(0, 0, 30);
+            TotalRounds = 15;
+            RoundLength = new TimeSpan(0, 2, 0);
             OnGoingNegotiations = new ConcurrentDictionary<string, NegotiationEngine>();
             TutorialModels = new ConcurrentDictionary<string, NegotiationTutorialModel>();
             LoadDbData();

@@ -20,19 +20,11 @@ namespace Dona.OfferTypesWithinRound
 
             if (RoundsPassed < Domain.NumberOfRounds - 1)
             {
-                CompareOffer(OpponentOffer, false);
-                int roundPart = (int)(Domain.RoundLength.TotalSeconds / BestFScoreUtilityOffers.Count);
-                int offerIndex = Math.Min(BestFScoreUtilityOffers.Count - 1, (((int)e.RemainingTime.TotalSeconds) / roundPart) % BestFScoreUtilityOffers.Count);
-                NegotiationOffer offer = BestFScoreUtilityOffers.Values.ElementAtOrDefault(offerIndex).Offer;
-                SendOffer(offer, false);
+                RoundRobinOffer(BestFScoreUtilityOffers.Values, e.RemainingTime);
             }
             else
             {
-                CompareOffer(OpponentOffer, false);
-                int roundPart = (int)(Domain.RoundLength.TotalSeconds / BestCombinedUtilityOffers.Count);
-                int offerIndex = Math.Min(BestCombinedUtilityOffers.Count - 1, ((int)e.RemainingTime.TotalSeconds) / roundPart);
-                NegotiationOffer offer = BestCombinedUtilityOffers.Values.ElementAtOrDefault(offerIndex).Offer;
-                SendOffer(offer, false);
+                RoundRobinOffer(BestCombinedUtilityOffers.Values, e.RemainingTime);
             }
         }
     }
