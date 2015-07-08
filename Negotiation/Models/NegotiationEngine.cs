@@ -176,10 +176,12 @@ namespace Negotiation.Models
         {
             Status.State = sender == AiChannel ? NegotiationState.EndAiOptOut : NegotiationState.EndHumanOptOut;
 
-            EndNegotiation();
+            TimeSpan remainingTime = Status.RemainingTime;
 
-            Status.HumanStatus.Score = Domain.CalculateOptoutScore(HumanConfig, Status.RemainingTime);
-            Status.AiStatus.Score = Domain.CalculateOptoutScore(AiConfig, Status.RemainingTime);
+            Status.HumanStatus.Score = Domain.CalculateOptoutScore(HumanConfig, remainingTime);
+            Status.AiStatus.Score = Domain.CalculateOptoutScore(AiConfig, remainingTime);
+
+            EndNegotiation();
 
             this.Actions.Add(new NegotiationActionModel()
             {
