@@ -181,8 +181,6 @@ namespace Negotiation.Models
             Status.HumanStatus.Score = Domain.CalculateOptoutScore(HumanConfig, remainingTime);
             Status.AiStatus.Score = Domain.CalculateOptoutScore(AiConfig, remainingTime);
 
-            EndNegotiation();
-
             this.Actions.Add(new NegotiationActionModel()
             {
                 RemainingTime = Status.RemainingTime,
@@ -191,6 +189,8 @@ namespace Negotiation.Models
             });
 
             NegotiationManager.SaveOptOut(this, sender == AiChannel ? AiConfig : HumanConfig);
+
+            EndNegotiation();
         }
 
         INegotiationChannel GetOtherChannel(INegotiationChannel channel)
