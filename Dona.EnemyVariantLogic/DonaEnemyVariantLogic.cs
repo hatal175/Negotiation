@@ -4,43 +4,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Negotiation.Models;
+using DonaStrategy;
 
 namespace Dona.EnemyVariantLogic
 {
     public class DonaEnemyVariantLogic : Basic.BasicDona
     {
-        public HashSet<String> PossibleEnemyVariants { get; set; }
+        private Dictionary<string, OfferUtility> m_BestCombinedUtilityOffers;
+        private Dictionary<string, OfferUtility> m_BestFScoreUtilityOffers;
+
+        private Dictionary<string, double> m_typeUtilities;
 
         public override void Initialize(Negotiation.Models.NegotiationDomain domain, Negotiation.Models.SideConfig strategyConfig, string opponentSide, Negotiation.Models.INegotiationClient client)
         {
             base.Initialize(domain, strategyConfig, opponentSide, client);
 
-            PossibleEnemyVariants = new HashSet<String>(domain.OwnerVariantDict[opponentSide].Keys);
+            m_BestCombinedUtilityOffers = new Dictionary<string, OfferUtility>(BestCombinedUtilityOffers);
+            m_BestFScoreUtilityOffers = new Dictionary<string, OfferUtility>(BestFScoreUtilityOffers);
+
+            m_typeUtilities = Domain.OwnerVariantDict[OpponentSide].Keys.ToDictionary(k => k, k => 0.0);
         }
 
         protected override void OnOfferReceivedEvent(object sender, Negotiation.Models.OfferEventArgs e)
         {
-            if (PossibleEnemyVariants.Count > 1)
+            foreach (string variant in Domain.OwnerVariantDict[OpponentSide].Keys)
             {
-                var utilites = PossibleEnemyVariants.Select(x => new {
-                    Variant = x,
-                    Utility = CalculateUtility(e.Offer.Offers, new SideConfig(OpponentSide, x))
-                });
-
-                double maxUtility = utilites.Max(x=>x.Utility);
-
-                var removedEnemyVariants = utilites.Where(x => x.Utility < maxUtility).Select(x => x.Variant).ToList();
-
-                if (removedEnemyVariants.Count > 0)
-                {
-                    foreach (var item in removedEnemyVariants)
-	                {
-                        PossibleEnemyVariants.Remove(item);
-                        BestCombinedUtilityOffers.Remove(item);
-                        BestFScoreUtilityOffers.Remove(item);
-	                }
-                }
+                m_typeUtilities[variant] += AllOptions[e.Offer].UtilityDataDict[variant].OpponentUtility;
             }
+
+            String opponentType = m_typeUtilities.ArgMax(x => x.Value).Key;
+
+            BestFScoreUtilityOffers = new Dictionary<string, OfferUtility> { { opponentType, m_BestFScoreUtilityOffers[opponentType] } };
+            BestCombinedUtilityOffers = new Dictionary<string, OfferUtility> { { opponentType, m_BestCombinedUtilityOffers[opponentType] } };
 
             base.OnOfferReceivedEvent(sender, e);
         }
