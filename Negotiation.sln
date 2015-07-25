@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dona.OfferTypesWithinRound"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DonaKBAgent", "KBAgent\DonaKBAgent.csproj", "{F6D0283A-1618-4BA2-A723-77D664E1EE73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dona.JustBest", "Dona.JustBest\Dona.JustBest.csproj", "{9A884F9F-9505-4810-BCC5-34350D40935A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dona.JustFScore", "Dona.JustFScore\Dona.JustFScore.csproj", "{2F337C00-9B99-4594-92AD-3AD58FEBE31B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6D0283A-1618-4BA2-A723-77D664E1EE73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A884F9F-9505-4810-BCC5-34350D40935A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A884F9F-9505-4810-BCC5-34350D40935A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A884F9F-9505-4810-BCC5-34350D40935A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A884F9F-9505-4810-BCC5-34350D40935A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F337C00-9B99-4594-92AD-3AD58FEBE31B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F337C00-9B99-4594-92AD-3AD58FEBE31B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F337C00-9B99-4594-92AD-3AD58FEBE31B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F337C00-9B99-4594-92AD-3AD58FEBE31B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
