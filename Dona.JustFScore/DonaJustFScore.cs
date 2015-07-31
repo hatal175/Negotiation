@@ -26,7 +26,7 @@ namespace Dona.JustFScore
 
             base.Initialize(domain, strategyConfig, opponentSide, client);
 
-            FScoreOffersByUtility = BestFScoreUtilityOffers.Values.OrderBy(x => x.Utility).ToList();
+            FScoreOffersByUtility = BestFScoreUtilityOffers.Values.OrderByDescending(x => x.Utility).ToList();
         }
 
         protected override void OnTimePassedEvent(object sender, ExtendedTimePassedEventArgs e)
