@@ -79,7 +79,8 @@ namespace Negotiation.Models
             NegotiationContainer cont = new NegotiationContainer();
             var strat = cont.StrategyConfigSet.FirstOrDefault();
 
-            m_currentStrategyDirPath = Path.GetDirectoryName(HttpContext.Current.Server.MapPath(strat.Strategy.DllPath));
+            if (strat != null)
+                m_currentStrategyDirPath = Path.GetDirectoryName(HttpContext.Current.Server.MapPath(strat.Strategy.DllPath));
         }
 
         static Assembly ResolveStrategyDlls (object sender, ResolveEventArgs args)
@@ -147,13 +148,25 @@ namespace Negotiation.Models
         public static AiConfig GetAiConfig()
         {
             NegotiationContainer cont = new NegotiationContainer();
-            var gameConfig = cont.GameDomainConfigSet.First();
+            var gameConfig = cont.GameDomainConfigSet.FirstOrDefault();
+
+            if (gameConfig == null)
+            {
+                return new AiConfig()
+                {
+                    Side = "",
+                    Variant = "",
+                    Type = UserType.Agent,
+                    StrategyId = 0
+                };
+            }
+
             var strat = cont.StrategyConfigSet.FirstOrDefault();
 
             return new AiConfig
             {
                 Side = gameConfig.AiSide,
-                Variant = gameConfig.AiVariant, 
+                Variant = gameConfig.AiVariant,
                 Type = UserType.Agent,
                 StrategyId = strat != null ? strat.Id : 0
             };
